@@ -79,3 +79,32 @@ export function profileAndScore(header, rows) {
 	const p = profileTable(header, rows);
 	return { profile: p, score: healthScore(p) };
 }
+
+/**
+ * Deterministic IQR bounds per numeric column.
+ *
+ * ANOMALY_MD was returning an empty answer: computing quartiles in-model burns
+ * its agent waves and it never emits. Quartiles are arithmetic, not judgement —
+ * compute them here and let the specialist do what a model is actually for:
+ * deciding which outliers matter and why.
+ */
+export function numericBounds(header, rows, k = 1.5) {
+	const out = {};
+	for (const h of header) {
+		const nums = rows.map((r) => r[h]).filter(isNumeric).map(Number).sort((a, b) => a - b);
+		if (nums.length < 4) continue;
+		const q = (p) => {
+			const i = (nums.length - 1) * p;
+			const lo = Math.floor(i), hi = Math.ceil(i);
+			return lo === hi ? nums[lo] : nums[lo] + (nums[hi] - nums[lo]) * (i - lo);
+		};
+		const q1 = q(0.25), q3 = q(0.75), iqr = q3 - q1;
+		out[h] = {
+			q1: round2(q1), q3: round2(q3), iqr: round2(iqr),
+			lower_fence: round2(q1 - k * iqr), upper_fence: round2(q3 + k * iqr),
+			min: nums[0], max: nums[nums.length - 1],
+		};
+	}
+	return out;
+}
+const round2 = (n) => Math.round(n * 100) / 100;

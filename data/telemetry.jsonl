@@ -61,3 +61,14 @@
 {"run_id":"run_v2_142554","agent":"SCHEMA_MD","mode":"parallel","query_count":1,"duration_ms":126011,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:28:06.674Z"}
 {"run_id":"run_v2_142554","agent":"DUPLICATE_MD","mode":"parallel","query_count":1,"duration_ms":126011,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:28:06.675Z"}
 {"run_id":"run_v2_142554","agent":"ANOMALY_MD","mode":"parallel","query_count":1,"duration_ms":126011,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:28:06.676Z"}
+{"run_id":"run_v3_142842","agent":"SCHEMA_MD","mode":"parallel","query_count":1,"duration_ms":60463,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:29:55.800Z"}
+{"run_id":"run_v3_142842","agent":"DUPLICATE_MD","mode":"parallel","query_count":1,"duration_ms":60463,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:29:55.801Z"}
+{"run_id":"run_v3_142842","agent":"ANOMALY_MD","mode":"parallel","query_count":1,"duration_ms":60463,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:29:55.801Z"}
+{"run_id":"run_v3_142842","agent":"SCHEMA_MD","mode":"sequential","query_count":1,"duration_ms":35505,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:30:31.312Z"}
+{"run_id":"run_20260911213053","agent":"SCHEMA_MD","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"dry-run","ts":"2026-09-11T21:30:53.040Z"}
+{"run_id":"run_20260911213053","agent":"DUPLICATE_MD","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"dry-run","ts":"2026-09-11T21:30:53.040Z"}
+{"run_id":"run_20260911213053","agent":"ANOMALY_MD","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"dry-run","ts":"2026-09-11T21:30:53.040Z"}
+{"run_id":"run_20260911213053","agent":"SCHEMA_MD","mode":"sequential","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"dry-run","ts":"2026-09-11T21:30:53.041Z"}
+{"run_id":"run_20260911213053","agent":"DUPLICATE_MD","mode":"sequential","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"dry-run","ts":"2026-09-11T21:30:53.041Z"}
+{"run_id":"run_20260911213053","agent":"ANOMALY_MD","mode":"sequential","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"dry-run","ts":"2026-09-11T21:30:53.041Z"}
+{"run_id":"run_20260911213053","agent":"RUN","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"findings=4 fixed=4 flagged=0 ignored=0 91.8->96.7","ts":"2026-09-11T21:30:53.043Z"}

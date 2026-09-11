@@ -14,7 +14,7 @@ import { randomUUID } from 'node:crypto';
 import { RocketRideClient, Question } from 'rocketride';
 
 import { parseCSV, toCSV } from './src/csv.mjs';
-import { profileAndScore } from './src/profile.mjs';
+import { profileAndScore, numericBounds } from './src/profile.mjs';
 import { SPECIALISTS, byId } from './src/specialists.mjs';
 import { buildParallel, buildSequential } from './src/genpipe.mjs';
 import { buildChief, ACTIONS } from './src/genchief.mjs';
@@ -97,6 +97,7 @@ function diagnosisQuestion(ds, spec = null) {
 	// the whole specialist fails. Take the prose and extract client-side
 	// instead — extractJSON() strips reasoning and finds the payload.
 	const q = new Question();
+	const forAll = spec == null;   // parallel wave: one envelope, all three read it
 	q.addQuestion([
 		spec ? `Diagnose this dataset as ${spec.id}.` : 'Diagnose this dataset for your own specialty only.',
 		'',
@@ -104,6 +105,18 @@ function diagnosisQuestion(ds, spec = null) {
 		'The number before each colon is the 0-based __row index to use in affected_rows:',
 		renderTable(ds),
 		'',
+		// Quartiles are arithmetic — hand them over precomputed rather than making
+		// the specialist derive them (it exhausts its waves and returns nothing).
+		...(spec?.id === 'ANOMALY_MD' || forAll
+			? [
+					'Precomputed IQR bounds per numeric column (k=' + cfg.anomaly.iqrMultiplier + '):',
+					JSON.stringify(numericBounds(ds.header, ds.rows, cfg.anomaly.iqrMultiplier), null, 0),
+					'A value outside [lower_fence, upper_fence] is a statistical_outlier.',
+					`Business ranges: ${JSON.stringify(cfg.anomaly.businessRanges)} — a value outside these is a business_range_violation even if inside the fences.`,
+					'Do NOT recompute the quartiles. Use the numbers above and report which rows violate them.',
+					'',
+				]
+			: []),
 		'Now return your findings JSON.',
 	].join('\n'));
 	return q;

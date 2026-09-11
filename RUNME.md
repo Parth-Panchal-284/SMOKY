@@ -67,10 +67,30 @@ copies of one model with different prompts.
 
 | Agent | Model | Tok/s | Why |
 |---|---|---|---|
-| `SCHEMA_MD` | `nvidia/Nemotron-3_5-Lightning` | 314 | Null/type/format checks are mechanical — throughput dominates. 30B MoE, 3B active, cheapest on the board. |
-| `DUPLICATE_MD` | `deepseek-ai/DeepSeek-V4-Flash-0731` | 351 | Fuzzy grouping needs every row in view simultaneously — 1M context. |
-| `ANOMALY_MD` | `zai-org/GLM-5.3-Flash` | 349 | Statistical reasoning needs more active parameters (320B / 18B active) while staying fast. |
-| `CHIEF` | `nvidia/Nemotron-3-Ultra-550b-a55b` | 523 | Conflict arbitration is the hardest judgement in the system; NVIDIA tunes this one for multi-agent reasoning. Runs once per run, so cost is bounded. Note: **regional endpoint** (`us-central1`). |
+| `SCHEMA_MD` | `Qwen/Qwen3-30B-A3B-Instruct-2507` | 70 | Non-thinking Instruct variant. Null/type/format checks are mechanical. |
+| `DUPLICATE_MD` | `deepseek-ai/DeepSeek-V4-Flash-0731` | 351 | 1M context — fuzzy grouping needs every row in view at once. |
+| `ANOMALY_MD` | `deepseek-ai/DeepSeek-V4-Flash-0731` | 351 | Same model; proven to emit clean JSON under `agent_rocketride`. |
+| `CHIEF` | `nvidia/Nemotron-3-Ultra-550b-a55b` | 523 | Tuned for multi-agent reasoning. Runs once per run, so cost is bounded. Note: **regional endpoint** (`us-central1`). |
+
+### Model choice is constrained — read before swapping one
+
+`agent_rocketride` requires **strict JSON** from its LLM. The engine retries 4
+times and then fails the whole specialist:
+
+```
+LLM error: Failed to get valid JSON response after 4 attempts.
+Last response: Here's a thinking process: 1. **Analyze User Input:** ...
+        at (/opt/rocketride/ai/common/chat.py:595)
+```
+
+**Reasoning / "thinking" models narrate before answering and are rejected.**
+Measured failures under `agent_rocketride`: `nvidia/Nemotron-3_5-Lightning` and
+`zai-org/GLM-5.3-Flash` — both fast, both unusable here. This is NOT fixable
+from the client: the rejection happens server-side before any response reaches
+`extractJSON()`, and dropping `expectJson` on the `Question` does not change it.
+
+Rule of thumb: pick the **Instruct** variant, never the **Thinking** one
+(`Qwen3-30B-A3B-Instruct-2507` works; `Qwen3-30B-A3B-Thinking-2507` would not).
 
 Configured in `config/dataer.config.json` under `llm.agents` — model, optional
 per-agent `baseUrl`, and token budget. The generator emits one `llm_nebius`
@@ -78,10 +98,15 @@ node per agent using the `custom` profile, which accepts any Token Factory
 routing key.
 
 **Why this mattered:** the first working model was `Llama-3.3-70B-Instruct` at
-**25 Tok/s** — the slowest option available. One specialist took 141s and the
-three-agent wave blew past a 300s timeout. Moving to 314-523 Tok/s models is
-roughly a 12-20x throughput change and is what makes the parallel-vs-sequential
-comparison land inside a live demo.
+**25 Tok/s** — the slowest option on the platform. One specialist took 141s and
+the three-agent wave blew past a 300s timeout. The current models are 70-523
+Tok/s.
+
+**Thread count is explicit.** `client.use()` takes `threads`; with it omitted
+the server chooses, and the "parallel" wave can end up serialised — which would
+make the whole comparison meaningless. Parallel mode requests one thread per
+specialist; sequential mode explicitly requests 1, so the baseline is a real
+baseline rather than an accident.
 
 ## Design decisions worth knowing
 
