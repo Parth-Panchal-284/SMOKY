@@ -79,6 +79,8 @@
 		"maxWaves": 2,
 		"agentTimeoutMs": 300000,
 		"threadsParallel": 12,
-		"_threads_comment": "Engine execution threads for the parallel wave. With hotdata on there are 17 nodes and 6 LLM invokers (3 agents + 3 SQL generators), so 4 threads under-serves it. Sequential deliberately uses 1 -- that is what makes it a baseline."
+		"_threads_comment": "Engine execution threads for the parallel wave. With hotdata on there are 17 nodes and 6 LLM invokers (3 agents + 3 SQL generators), so 4 threads under-serves it. Sequential deliberately uses 1 -- that is what makes it a baseline.",
+		"maxPromptRows": 200,
+		"_maxPromptRows_comment": "Rows inlined into a specialist prompt. A 1.6M-row upload crashed with V8 'Invalid string length'. Above this the prompt carries a head/spread/tail sample plus full-dataset column statistics; real row indices are preserved so affected_rows stays valid."
 	}
 }

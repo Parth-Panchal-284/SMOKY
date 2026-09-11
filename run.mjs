@@ -80,9 +80,42 @@ export function get_profiled_dataset(_run_id) { return intake(); }
  * Keep the data in the prompt body.
  */
 function renderTable(ds) {
-	return ds.rows
-		.map((r, i) => `${i}: ${ds.header.map((h) => `${h}=${JSON.stringify(r[h] ?? '')}`).join(', ')}`)
+	// A 145MB / 1.6M-row upload crashed both specialists with V8's
+	// "Invalid string length": inlining every row builds a string past the
+	// engine's maximum. Send a bounded SAMPLE plus the deterministic column
+	// statistics instead -- the profiler has already seen all 1.6M rows, so
+	// nothing is lost that the specialists could have computed themselves.
+	const cap = cfg.run.maxPromptRows ?? 200;
+	const n = ds.rows.length;
+	const pick = [];
+	if (n <= cap) {
+		ds.rows.forEach((r, i) => pick.push([i, r]));
+	} else {
+		// head, evenly spaced middle, tail — outliers cluster at the extremes
+		const head = Math.floor(cap * 0.4), tail = Math.floor(cap * 0.2);
+		for (let i = 0; i < head; i++) pick.push([i, ds.rows[i]]);
+		const step = Math.max(1, Math.floor((n - head - tail) / (cap - head - tail)));
+		for (let i = head; i < n - tail && pick.length < cap - tail; i += step) pick.push([i, ds.rows[i]]);
+		for (let i = Math.max(0, n - tail); i < n; i++) pick.push([i, ds.rows[i]]);
+	}
+	const body = pick
+		.map(([i, r]) => `${i}: ${ds.header.map((h) => `${h}=${JSON.stringify(r[h] ?? '')}`).join(', ')}`)
 		.join('\n');
+	if (n <= cap) return body;
+	return [
+		`NOTE: ${n} rows total; ${pick.length} shown (head, spread, tail). Row indices are`,
+		'the REAL indices in the full dataset, so affected_rows stays meaningful.',
+		'Column statistics below are computed over ALL rows, not the sample:',
+		JSON.stringify(
+			Object.fromEntries(Object.entries(ds.profile.columns).map(([c, st]) => [c, {
+				nulls: st.nullCount, nullRatio: Number(st.nullRatio.toFixed(3)),
+				distinct: st.distinct, numericRatio: Number(st.numericRatio.toFixed(2)),
+				dateShapes: st.dateShapes,
+			}])),
+		),
+		'',
+		body,
+	].join('\n');
 }
 /**
  * The SAME envelope for both modes — if the payloads differed, the

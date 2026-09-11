@@ -13,3 +13,5 @@ data/uploads/
 !data/tests/
 out/runs/
 out/*.stdout
+out/cleaned.csv
+out/runs/*.csv

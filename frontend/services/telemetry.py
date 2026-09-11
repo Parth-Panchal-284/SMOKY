@@ -60,8 +60,18 @@ def load() -> dict[str, Any]:
             a["queries"] += int(e.get("query_count") or 0)
             if e.get("outcome") != "ok":
                 a["fail"] += 1
-        if mode in ("parallel", "sequential") and dur:
-            r["modes"][mode] = max(r["modes"].get(mode, 0), dur)
+        if mode in ("parallel", "sequential") and dur and agent in SPECIALISTS:
+            # The two modes must be aggregated differently or the comparison is
+            # meaningless. In PARALLEL the harness stamps the whole wave onto
+            # every agent row, so the wave is max() (they overlap). In SEQUENTIAL
+            # each row is that agent's own slice and they run back to back, so
+            # the mode costs sum(). Taking max() for both compared "the entire
+            # parallel wave" against "the slowest single sequential agent",
+            # which made parallel look slower than sequential in 4 of 5 runs.
+            if mode == "parallel":
+                r["modes"][mode] = max(r["modes"].get(mode, 0), dur)
+            else:
+                r["modes"][mode] = r["modes"].get(mode, 0) + dur
         if agent == "RUN":
             r["note"] = e.get("note", "")
             r["outcome"] = e.get("outcome", "")

@@ -401,6 +401,42 @@ def telemetry() -> None:
         else:
             st.info("No agent events yet.")
 
+    # Parallel vs sequential ACROSS RUNS.
+    # Only runs that exercised BOTH modes are plotted: a run that did one mode
+    # has nothing to compare against, and including it (as a zero bar) dragged
+    # the average speedup below 1.0 and made parallel look slower than
+    # sequential, which is the opposite of what the data shows.
+    st.markdown("**Parallel vs sequential across past runs** (wave duration, seconds)")
+    both = [
+        r for r in runs
+        if (r.get("modes") or {}).get("parallel") and (r.get("modes") or {}).get("sequential")
+    ]
+    if both:
+        labels = [str(r.get("run_id", "?")).replace("run_", "")[:12] for r in both]
+        par = [round(r["modes"]["parallel"] / 1000, 1) for r in both]
+        seq = [round(r["modes"]["sequential"] / 1000, 1) for r in both]
+        st.bar_chart({"parallel": par, "sequential": seq}, height=260, stack=False)
+
+        ratios = [s_ / p_ for p_, s_ in zip(par, seq)]
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Avg parallel", f"{sum(par)/len(par):.0f}s")
+        c2.metric("Avg sequential", f"{sum(seq)/len(seq):.0f}s")
+        c3.metric("Best speedup", f"{max(ratios):.2f}×")
+        st.caption(
+            f"{len(both)} of {len(runs)} runs exercised both modes. Bars are the slowest "
+            "agent in that wave. Early runs used Llama-3.3-70B at 25 Tok/s before the "
+            "per-agent models landed, so the left of the chart is slower across the board."
+        )
+        st.dataframe(
+            [
+                {"run": l, "parallel_s": p_, "sequential_s": s_, "speedup": f"{s_/p_:.2f}×"}
+                for l, p_, s_ in zip(labels, par, seq)
+            ],
+            width="stretch",
+        )
+    else:
+        st.info("No run has exercised both modes yet — use `--mode both`.")
+
     st.markdown("**Health score across sessions**")
     series = [r for r in runs if r.get("after_score") is not None]
     if series:
