@@ -2,7 +2,7 @@ import { writeFileSync, readFileSync } from 'node:fs';
 import { buildParallel, buildSequential } from './genpipe.mjs';
 import { buildChief } from './genchief.mjs';
 
-const cfg = JSON.parse(readFileSync('config/dataer.config.json', 'utf8'));
+const cfg = JSON.parse(readFileSync('config/smoky.config.json', 'utf8'));
 const w = (p, o) => { writeFileSync(p, JSON.stringify(o, null, '\t') + '\n'); console.log('wrote', p, `(${o.components.length} nodes)`); };
 
 w('pipelines/diagnosis.pipe', buildParallel(cfg));

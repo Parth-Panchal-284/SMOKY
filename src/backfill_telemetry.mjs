@@ -33,6 +33,6 @@ await client.connect();
 let last = null;
 for (const r of runs) last = await publishTelemetry(client, events.filter((e) => e.run_id === r.run_id), r);
 console.log('backfilled:', JSON.stringify(last), '| runs:', runs.length, '| events:', events.length);
-const check = await client.fsReadJson('dataer/telemetry.json');
+const check = await client.fsReadJson('smoky/telemetry.json');
 console.log('verified in store -> events:', check.events.length, 'runs:', check.runs.length);
 await client.disconnect();

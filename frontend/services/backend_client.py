@@ -1,4 +1,4 @@
-"""Sole backend integration point for the DATA ER UI.
+"""Sole backend integration point for the SMOKY UI.
 
 DEMO_MODE=True loads deterministic mock events.
 DEMO_MODE=False reads the REAL RocketRide run produced by the harness:
@@ -21,9 +21,9 @@ from pathlib import Path
 from typing import Any
 
 # Live by default: this console reads real RocketRide runs.
-# Set DATA_ER_DEMO_MODE=1 to fall back to the canned timeline.
+# Set SMOKY_DEMO_MODE=1 to fall back to the canned timeline.
 DEMO_MODE = False
-_env = os.environ.get("DATA_ER_DEMO_MODE")
+_env = os.environ.get("SMOKY_DEMO_MODE")
 if _env is not None:
     DEMO_MODE = _env.strip() not in {"0", "false", "False", "no"}
 

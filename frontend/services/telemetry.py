@@ -1,9 +1,9 @@
-"""Cross-session telemetry reader for the DATA ER console.
+"""Cross-session telemetry reader for the SMOKY console.
 
 Reads the SAME data the RocketRide dashboard app reads. Two sources, in order
 of preference:
 
-  1. dataer/telemetry.json in the RocketRide cloud file store -- the real
+  1. smoky/telemetry.json in the RocketRide cloud file store -- the real
      cross-session record, written by run.mjs after every run. Requires the
      Python SDK and a connection, so it is best-effort.
   2. data/telemetry.jsonl on disk -- always present, same rows, no network.

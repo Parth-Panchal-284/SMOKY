@@ -20,8 +20,8 @@ import App from './App';
 
 const descriptor: AppDescriptor = {
 	id: 'local.dataer-telemetry',
-	name: 'Data ER Telemetry',
-	branding: { appName: 'Data ER Telemetry' },
+	name: 'SMOKY Telemetry',
+	branding: { appName: 'SMOKY Telemetry' },
 	app: App,
 };
 

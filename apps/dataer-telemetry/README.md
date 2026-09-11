@@ -1,6 +1,6 @@
-# Data ER Telemetry
+# SMOKY Telemetry
 
-Data ER Telemetry — a RocketRide app.
+SMOKY Telemetry — a RocketRide app.
 
 ## What it does
 

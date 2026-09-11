@@ -3,9 +3,9 @@
  * read it LIVE over the shell connection. Without this the dashboard could only
  * show a build-time snapshot — the README requires live queries, not screenshots.
  *
- * Path: dataer/telemetry.json (account-private file store)
+ * Path: smoky/telemetry.json (account-private file store)
  */
-export const TELEMETRY_PATH = 'dataer/telemetry.json';
+export const TELEMETRY_PATH = 'smoky/telemetry.json';
 
 /** Merge new events into whatever is already in the store, de-duplicated. */
 export async function publishTelemetry(client, events, summary) {
@@ -21,7 +21,7 @@ export async function publishTelemetry(client, events, summary) {
 		.sort((a, b) => String(a.finished_at).localeCompare(String(b.finished_at)));
 
 	const payload = { updated_at: new Date().toISOString(), events: merged.slice(-2000), runs: runs.slice(-200) };
-	try { await client.fsMkdir('dataer'); } catch { /* exists */ }
+	try { await client.fsMkdir('smoky'); } catch { /* exists */ }
 	await client.fsWriteJson(TELEMETRY_PATH, payload);
 	return { path: TELEMETRY_PATH, events: payload.events.length, runs: payload.runs.length };
 }

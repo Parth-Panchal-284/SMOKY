@@ -1,4 +1,4 @@
-"""Backend event contract for DATA ER.
+"""Backend event contract for SMOKY.
 
 UI components consume these shapes only. Do not import RocketRide internals here.
 """

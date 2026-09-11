@@ -1,4 +1,4 @@
-# DATA ER
+# SMOKY
 
 Clinical operations console for an AI-powered data repair system.
 
@@ -21,6 +21,6 @@ Replace the stub in [`services/backend_client.py`](services/backend_client.py):
 
 - `poll_events(run_id, cursor, elapsed)` — the function the UI calls every second
 - `fetch_live_events(...)` — put the real HTTP / SSE / websocket client here
-- Set `DEMO_MODE = False` (or env `DATA_ER_DEMO_MODE=0`) when the live adapter is ready
+- Set `DEMO_MODE = False` (or env `SMOKY_DEMO_MODE=0`) when the live adapter is ready
 
 UI components never import the mock source. After go-live you can delete [`services/mock_events.py`](services/mock_events.py).

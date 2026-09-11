@@ -15,7 +15,7 @@
  *       Handled natively by the `db_hotdata` pipeline component — it creates one
  *       ephemeral database per run, lets the agent inspect its live schema and
  *       run read-only SQL, and destroys it at teardown. Turn it on by setting
- *       hotdata.enabled = true in config/dataer.config.json and supplying
+ *       hotdata.enabled = true in config/smoky.config.json and supplying
  *       ROCKETRIDE_HOTDATA_KEY + ROCKETRIDE_HOTDATA_WORKSPACE in .env.
  *       => create_db / query / destroy_db below are then NO-OPS in the harness:
  *          the pipeline is doing it. They stay here to keep the audit shape.

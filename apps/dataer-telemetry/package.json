@@ -2,13 +2,13 @@
   "name": "local-dataer-telemetry",
   "version": "0.1.0",
   "private": true,
-  "description": "Data ER Telemetry — a RocketRide app",
+  "description": "SMOKY \u2014 live telemetry for the multi-agent data diagnosis pipeline",
   "license": "MIT",
   "appManifest": {
     "id": "local.dataer-telemetry",
     "publisher": "local",
-    "name": "Data ER Telemetry",
-    "description": "Data ER Telemetry — a RocketRide app",
+    "name": "SMOKY Telemetry",
+    "description": "SMOKY \u2014 live telemetry for the multi-agent data diagnosis pipeline",
     "icon": "./icon.svg",
     "readme": "./README.md",
     "categories": [

@@ -37,7 +37,7 @@ def render_header(state: RunState) -> str:
 <header class="top-header">
   <div class="brand">
     <div class="brand-row">
-      <span class="brand-name">DATA ER</span>
+      <span class="brand-name">SMOKY</span>
       {ECG}
     </div>
     <div class="brand-sub">OPERATIONAL CONSOLE</div>

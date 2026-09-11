@@ -1,4 +1,4 @@
-# Data ER — RocketRide side
+# SMOKY — RocketRide side
 
 Two pipelines plus the harness that runs them. Parallel specialist diagnosis,
 then reconcile → repair → verify with a real rollback.
@@ -56,7 +56,7 @@ node --env-file=.env src/validate.mjs   # validate all of them against staging
 | `src/repair.mjs` | Allow-listed transforms + audit trail |
 | `src/verify.mjs` | Invariant checks + real rollback |
 | `src/slice.mjs` | Per-specialist isolated data slice |
-| `config/dataer.config.json` | Every tunable: LLM, thresholds, business ranges, allow-list, Hotdata flag |
+| `config/smoky.config.json` | Every tunable: LLM, thresholds, business ranges, allow-list, Hotdata flag |
 | `run.mjs` | The harness — both modes, timing, telemetry, repair, verify |
 
 ## One model per agent
@@ -92,7 +92,7 @@ from the client: the rejection happens server-side before any response reaches
 Rule of thumb: pick the **Instruct** variant, never the **Thinking** one
 (`Qwen3-30B-A3B-Instruct-2507` works; `Qwen3-30B-A3B-Thinking-2507` would not).
 
-Configured in `config/dataer.config.json` under `llm.agents` — model, optional
+Configured in `config/smoky.config.json` under `llm.agents` — model, optional
 per-agent `baseUrl`, and token budget. The generator emits one `llm_nebius`
 node per agent using the `custom` profile, which accepts any Token Factory
 routing key.

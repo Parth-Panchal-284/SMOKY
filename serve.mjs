@@ -63,7 +63,7 @@ if (existing) {
 } else {
 	// ttl: 0 => no idle timeout, so the task outlives this process.
 	const res = await client.use({
-		pipeline, ttl: 0, threads: 4, name: 'dataer-webhook-endpoint',
+		pipeline, ttl: 0, threads: 4, name: 'smoky-webhook-endpoint',
 	});
 	console.log('started task token:', res.token);
 	// The start response may carry the generated webhook credentials.

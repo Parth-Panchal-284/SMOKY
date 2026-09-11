@@ -3,7 +3,7 @@
 // Copyright (c) 2026 Aparavi Software AG
 // =============================================================================
 
-/** Shapes written by the Data ER harness (src/publish_telemetry.mjs). */
+/** Shapes written by the SMOKY harness (src/publish_telemetry.mjs). */
 
 export interface TelemetryEvent {
 	run_id: string;

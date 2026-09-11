@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Data ER harness — runs both pipelines end to end and prints the numbers the
+ * SMOKY harness — runs both pipelines end to end and prints the numbers the
  * demo needs: {mode, duration_ms} for the parallel-vs-sequential comparison,
  * before/after health score, and the full audit trail.
  *
@@ -29,7 +29,7 @@ const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf(`--${k}`); return i >= 0 ? argv[i + 1] : d; };
 const flag = (k) => argv.includes(`--${k}`);
 
-const cfg = JSON.parse(readFileSync('config/dataer.config.json', 'utf8'));
+const cfg = JSON.parse(readFileSync('config/smoky.config.json', 'utf8'));
 const csvPath = arg('csv', 'data/sample.csv');
 const modeArg = arg('mode', 'parallel');   // fastest path; --mode both for the speedup comparison
 const runId = arg('run-id', `run_${new Date().toISOString().slice(0, 19).replace(/[:T-]/g, '')}`);
@@ -168,7 +168,7 @@ async function runAgentsParallel(client, ds) {
 	const { token } = await client.use({
 		pipeline, ttl: cfg.run.ttlSeconds,
 		threads: cfg.run.threadsParallel ?? Math.max(4, SPECIALISTS.length),
-		name: `dataer-diagnosis-parallel-${runId}`,
+		name: `smoky-diagnosis-parallel-${runId}`,
 	});
 	try {
 		// One wave: every specialist receives the same envelope and answers together.
@@ -193,7 +193,7 @@ async function runAgentsSequential(client, ds) {
 		try {
 			const { token } = await client.use({
 				pipeline, ttl: cfg.run.ttlSeconds, threads: 1,
-				name: `dataer-diagnosis-seq-${spec.id}-${runId}`,
+				name: `smoky-diagnosis-seq-${spec.id}-${runId}`,
 			});
 			try {
 				const res = await withTimeout(
@@ -260,7 +260,7 @@ async function runChief(client, findings) {
 	if (!findings.length) return { decisions: [], duration: 0 };
 	const pipeline = buildChief(cfg);
 	const t0 = performance.now();
-	const { token } = await client.use({ pipeline, ttl: cfg.run.ttlSeconds, name: `dataer-chief-${runId}` });
+	const { token } = await client.use({ pipeline, ttl: cfg.run.ttlSeconds, name: `smoky-chief-${runId}` });
 	try {
 		const q = new Question();
 		q.addQuestion([

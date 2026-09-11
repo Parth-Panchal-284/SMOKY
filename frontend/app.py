@@ -1,4 +1,4 @@
-"""DATA ER — Operating Room console.
+"""SMOKY — Operating Room console.
 
 Custom HTML/CSS rendered through Streamlit. Demo state lives in session_state.
 RocketRide integration happens only via services.backend_client.poll_events.
@@ -26,7 +26,7 @@ from ui.shell import render_app_html
 
 st.set_page_config(
     layout="wide",
-    page_title="DATA ER",
+    page_title="SMOKY",
     page_icon="🏥",
     initial_sidebar_state="collapsed",
 )
@@ -369,7 +369,7 @@ def telemetry() -> None:
     c[4].metric("Rollbacks", sum(1 for r in runs if r.get("outcome") == "rolled_back"))
 
     st.caption(
-        f"Live from `{TELEMETRY.name}` · also published to `dataer/telemetry.json` "
+        f"Live from `{TELEMETRY.name}` · also published to `smoky/telemetry.json` "
         f"in the RocketRide cloud store · refreshes every 3s"
     )
 

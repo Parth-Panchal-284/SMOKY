@@ -4,10 +4,10 @@
 // =============================================================================
 
 /**
- * Data ER Telemetry — live dashboard for the Data ER multi-agent pipeline.
+ * SMOKY Telemetry — live dashboard for the SMOKY multi-agent pipeline.
  *
  * Data path: the harness (run.mjs) publishes every run to the account's cloud
- * file store at `dataer/telemetry.json`; this app polls it over the shell's
+ * file store at `smoky/telemetry.json`; this app polls it over the shell's
  * connection. That is what makes the demo LIVE rather than a screenshot — the
  * numbers move while a run is in flight.
  */
@@ -20,7 +20,7 @@ import type { TelemetryPayload, RunSummary, TelemetryEvent } from './types';
 import { Stat, ModeBars, AgentBars, HealthTrend, Donut, Empty, fmtMs, NUM } from './charts';
 import type { AgentStat, TrendPoint } from './charts';
 
-const TELEMETRY_PATH = 'dataer/telemetry.json';
+const TELEMETRY_PATH = 'smoky/telemetry.json';
 const POLL_MS = 5000;
 
 // =============================================================================
@@ -217,7 +217,7 @@ const Content: React.FC = () => {
 	return (
 		<div style={{ padding: '16px 20px 28px', fontFamily: 'var(--rr-font-family, system-ui)' }}>
 			<ContentHeader
-				title="Data ER Telemetry"
+				title="SMOKY Telemetry"
 				subtitle="Parallel specialist diagnosis · reconcile · repair · verify — live from the RocketRide pipeline"
 				actions={
 					<span style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
