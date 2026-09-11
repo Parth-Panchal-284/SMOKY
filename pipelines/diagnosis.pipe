@@ -64,7 +64,7 @@
 					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
 					"- Do NOT wrap the JSON in markdown fences."
 				],
-				"max_waves": 6,
+				"max_waves": 4,
 				"parameters": {}
 			},
 			"input": [
@@ -220,7 +220,7 @@
 					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
 					"- Do NOT wrap the JSON in markdown fences."
 				],
-				"max_waves": 6,
+				"max_waves": 4,
 				"parameters": {}
 			},
 			"input": [
@@ -377,7 +377,7 @@
 					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
 					"- Do NOT wrap the JSON in markdown fences."
 				],
-				"max_waves": 6,
+				"max_waves": 4,
 				"parameters": {}
 			},
 			"input": [
@@ -520,7 +520,7 @@
 		}
 	],
 	"source": "chat_1",
-	"project_id": "a94cbfa1-fa5e-46d6-a48f-1521abdabca1",
+	"project_id": "c28aa070-27c8-432c-b5af-4f2279f61de8",
 	"viewport": {
 		"x": 0,
 		"y": 0,

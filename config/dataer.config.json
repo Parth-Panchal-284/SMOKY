@@ -41,7 +41,8 @@
 		"max_attempts": 3,
 		"max_execute_rows": 25000,
 		"useRealTelemetrySink": false,
-		"_sink_comment": "Separate from `enabled`. `enabled` wires db_hotdata INTO the pipeline (ephemeral, per-run, engine-managed). This flag switches the HOST-SIDE persistent telemetry sink to RealHotdata, which is the teammate's unimplemented half. Leave false until RealHotdata.log_event exists."
+		"_sink_comment": "Separate from `enabled`. `enabled` wires db_hotdata INTO the pipeline (ephemeral, per-run, engine-managed). This flag switches the HOST-SIDE persistent telemetry sink to RealHotdata, which is the teammate's unimplemented half. Leave false until RealHotdata.log_event exists.",
+		"_status": "WORKS in sequential mode: one specialist + its own ephemeral DB measured at 83s end to end. The 300s timeout was blown by three agents contending inside ONE parallel wave, not by Hotdata itself. Sequential gives each agent its own timeout."
 	},
 	"anomaly": {
 		"iqrMultiplier": 1.5,
@@ -75,7 +76,7 @@
 	},
 	"run": {
 		"ttlSeconds": 600,
-		"maxWaves": 6,
-		"agentTimeoutMs": 300000
+		"maxWaves": 4,
+		"agentTimeoutMs": 420000
 	}
 }

@@ -1,0 +1,60 @@
+run_id=run_demo_144847  csv=data/sample.csv  rows=12  cols=7
+baseline health score: 91.8
+
+=== DIAGNOSIS (parallel) ===
+  fan-out returned 3 answer(s) (expected 3)
+  findings: 6  (unparseable replies: 1)
+    ? unparsed: 
+    [SCHEMA_MD] null_values (high) -> fill_null_with
+    [SCHEMA_MD] inconsistent_date_format (high) -> standardize_date_format
+    [SCHEMA_MD] type_mismatch (medium) -> none
+    [SCHEMA_MD] schema_drift (high) -> trim_normalize_whitespace
+    [ANOMALY_MD] business_range_violation (high) -> flag_outlier
+    [ANOMALY_MD] business_range_violation (high) -> flag_outlier
+
+=== DIAGNOSIS (sequential) ===
+  findings: 10
+    [SCHEMA_MD] null_values (high) -> fill_null_with
+    [SCHEMA_MD] inconsistent_date_format (high) -> standardize_date_format
+    [SCHEMA_MD] type_mismatch (medium) -> none
+    [SCHEMA_MD] trim_normalize_whitespace (low) -> trim_normalize_whitespace
+    [DUPLICATE_MD] fuzzy_duplicate (high) -> merge_duplicate_rows
+    [DUPLICATE_MD] fuzzy_duplicate (high) -> merge_duplicate_rows
+    [ANOMALY_MD] statistical_outlier (high) -> flag_outlier
+    [ANOMALY_MD] business_range_violation (high) -> flag_outlier
+    [ANOMALY_MD] statistical_outlier (high) -> flag_outlier
+    [ANOMALY_MD] business_range_violation (high) -> flag_outlier
+
+=== TIMING (parallel vs sequential) ===
+  {"mode":"parallel","duration_ms":49575}
+  {"mode":"sequential","duration_ms":80311}
+  speedup: 1.62x  (saved 30736 ms)
+
+=== RECONCILE (chief) ===
+  chief returned 10 decision(s) in 51285ms
+    #0 flag_for_review via fill_null_with — Proposed action fill_null_with is in allow-list but uncertainty about fill values warrants
+    #1 auto_fix via standardize_date_format — Date format standardization is a clear formatting fix with high confidence, allowed by rul
+    #2 flag_for_review — Proposed action 'none' is not in allow-list, so rule 5 requires flag_for_review.
+    #3 auto_fix via trim_normalize_whitespace — Whitespace normalization is a straightforward formatting fix allowed by rule 5.
+    #4 flag_for_review via merge_duplicate_rows — Duplicate rows differ in formatting (name, email case, date format, city casing) so they d
+    #5 flag_for_review via merge_duplicate_rows — Duplicate rows differ in name formatting (extra spaces) so they do not agree on every non-
+    #6 flag_for_review via flag_outlier — Anomaly findings are never auto_fix and at most flag_for_review per rule 3.
+    #7 flag_for_review via flag_outlier — Anomaly findings are never auto_fix and at most flag_for_review per rule 3.
+    #8 flag_for_review via flag_outlier — Anomaly findings are never auto_fix and at most flag_for_review per rule 3.
+    #9 flag_for_review via flag_outlier — Anomaly findings are never auto_fix and at most flag_for_review per rule 3.
+
+=== REPAIR (allow-listed transforms only) ===
+  applied 2 decision(s), 5 change(s), 0 row(s) merged away
+
+=== VERIFY ===
+  PASS row_loss_explained — lost 0 row(s); 0 explained by merge_duplicate_rows
+  PASS row_loss_bounded — lost 0.0% (limit 25%)
+  PASS no_column_emptied — none emptied
+  PASS score_not_worse — before 91.8 -> after 92.9
+  PASS audit_complete — 5 audit record(s)
+  health score: 91.8 -> 92.9
+  telemetry published -> dataer/telemetry.json (48 events, 8 runs)
+
+  leaked Hotdata databases: 0 (none — create/destroy balanced)
+
+wrote out/cleaned.csv and out/evidence_report.json

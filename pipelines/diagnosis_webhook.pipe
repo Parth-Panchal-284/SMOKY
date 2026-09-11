@@ -87,7 +87,7 @@
 					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
 					"- Do NOT wrap the JSON in markdown fences."
 				],
-				"max_waves": 6,
+				"max_waves": 4,
 				"parameters": {}
 			},
 			"input": [
@@ -243,7 +243,7 @@
 					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
 					"- Do NOT wrap the JSON in markdown fences."
 				],
-				"max_waves": 6,
+				"max_waves": 4,
 				"parameters": {}
 			},
 			"input": [
@@ -400,7 +400,7 @@
 					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
 					"- Do NOT wrap the JSON in markdown fences."
 				],
-				"max_waves": 6,
+				"max_waves": 4,
 				"parameters": {}
 			},
 			"input": [
@@ -543,7 +543,7 @@
 		}
 	],
 	"source": "webhook_1",
-	"project_id": "2a7d2963-743a-46bc-b940-03eb83065069",
+	"project_id": "e5bb827c-089b-4030-a47b-99b93604ea63",
 	"viewport": {
 		"x": 0,
 		"y": 0,

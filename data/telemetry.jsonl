@@ -81,3 +81,14 @@
 {"run_id":"run_final_143053","agent":"RUN","mode":"parallel","query_count":0,"duration_ms":197901,"outcome":"ok","cost":0,"note":"findings=11 fixed=7 flagged=4 ignored=0 91.8->94.5","ts":"2026-09-11T21:34:46.387Z"}
 {"run_id":"run_hd_143623","agent":"WAVE","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"failed","cost":0,"note":"Connection closed unexpectedly","ts":"2026-09-11T21:39:03.317Z"}
 {"run_id":"run_hd_143623","agent":"RUN","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"findings=0 fixed=0 flagged=0 ignored=0 91.8->91.8","ts":"2026-09-11T21:39:03.319Z"}
+{"run_id":"run_hd2_144251","agent":"WAVE","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"failed","cost":0,"note":"parallel wave timed out after 300000ms","ts":"2026-09-11T21:48:04.831Z"}
+{"run_id":"run_hd2_144251","agent":"RUN","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"findings=0 fixed=0 flagged=0 ignored=0 91.8->91.8","ts":"2026-09-11T21:48:04.834Z"}
+{"run_id":"run_demo_144847","agent":"SCHEMA_MD","mode":"parallel","query_count":1,"duration_ms":49575,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:49:43.379Z"}
+{"run_id":"run_demo_144847","agent":"DUPLICATE_MD","mode":"parallel","query_count":1,"duration_ms":49575,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:49:43.381Z"}
+{"run_id":"run_demo_144847","agent":"ANOMALY_MD","mode":"parallel","query_count":1,"duration_ms":49575,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:49:43.381Z"}
+{"run_id":"run_demo_144847","agent":"SCHEMA_MD","mode":"sequential","query_count":1,"duration_ms":24092,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:50:07.476Z"}
+{"run_id":"run_demo_144847","agent":"DUPLICATE_MD","mode":"sequential","query_count":1,"duration_ms":23223,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:50:30.700Z"}
+{"run_id":"run_demo_144847","agent":"ANOMALY_MD","mode":"sequential","query_count":1,"duration_ms":32993,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:51:03.693Z"}
+{"run_id":"run_demo_144847","agent":"RUN","mode":"sequential","query_count":0,"duration_ms":129886,"outcome":"ok","cost":0,"note":"findings=10 fixed=2 flagged=8 ignored=0 91.8->92.9","ts":"2026-09-11T21:52:00.277Z"}
+{"run_id":"run_hotdata_seq_145306","agent":"SCHEMA_MD","mode":"sequential","query_count":1,"duration_ms":58123,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:54:05.553Z"}
+{"run_id":"run_hotdata_seq_145306","agent":"DUPLICATE_MD","mode":"sequential","query_count":1,"duration_ms":45370,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:54:50.924Z"}
