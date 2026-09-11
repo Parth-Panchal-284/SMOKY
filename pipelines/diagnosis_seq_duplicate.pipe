@@ -1,0 +1,154 @@
+{
+	"components": [
+		{
+			"id": "chat_1",
+			"provider": "chat",
+			"config": {
+				"hideForm": true,
+				"mode": "Source",
+				"parameters": {},
+				"type": "chat"
+			},
+			"ui": {
+				"position": {
+					"x": 20,
+					"y": 200
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "agent_duplicate",
+			"provider": "agent_rocketride",
+			"config": {
+				"instructions": [
+					"You are DUPLICATE_MD, a data-quality specialist that finds duplicate and near-duplicate records.",
+					"",
+					"- Normalise text before comparing: trim, collapse inner whitespace, casefold, ignore punctuation.",
+					"- Find exact duplicate rows AND near-duplicates (same person/entity written differently: \"Jon Smith\" vs \"jon  smith\", \"ACME Inc\" vs \"Acme, Inc.\").",
+					"- Group candidates: every finding should list ALL row indices in the duplicate group in affected_rows.",
+					"- Do not flag a row as duplicate merely because one shared field matches — require the row to plausibly describe the same entity.",
+					"- Use finding_type values like: exact_duplicate, fuzzy_duplicate.",
+					"- Propose merge_duplicate_rows for groups you are confident about; propose \"none\" when it may be a legitimate re-entry and let the chief agent decide.",
+					"- Do NOT report nulls, formats or numeric outliers — other specialists own those.",
+					"",
+					"Return ONLY a JSON object, no prose and no markdown fence:",
+					"{\"agent\": \"DUPLICATE_MD\", \"findings\": [ {",
+					"  \"finding_type\": \"<short_snake_case_kind>\",",
+					"  \"severity\": \"low\" | \"medium\" | \"high\",",
+					"  \"affected_columns\": [\"<column name>\", ...],",
+					"  \"affected_rows\": [<0-based row index>, ...],",
+					"  \"evidence\": \"<one sentence citing concrete values you saw>\",",
+					"  \"proposed_action\": \"trim_normalize_whitespace\" | \"standardize_date_format\" |",
+					"                     \"fill_null_with\" | \"merge_duplicate_rows\" | \"flag_outlier\" | \"none\"",
+					"} ]}",
+					"If you find nothing, return {\"agent\": \"DUPLICATE_MD\", \"findings\": []}.",
+					"Never invent a row index or column name that is not in the data you were given."
+				],
+				"max_waves": 2,
+				"parameters": {}
+			},
+			"input": [
+				{
+					"lane": "questions",
+					"from": "chat_1"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 120
+				},
+				"measured": {
+					"width": 150,
+					"height": 86
+				}
+			}
+		},
+		{
+			"id": "llm_duplicate",
+			"provider": "llm_nebius",
+			"config": {
+				"profile": "custom",
+				"custom": {
+					"apikey": "${ROCKETRIDE_NEBIUS_KEY}",
+					"model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+					"base_url": "https://api.tokenfactory.nebius.com/v1/",
+					"modelTotalTokens": 131072
+				},
+				"parameters": {}
+			},
+			"control": [
+				{
+					"classType": "llm",
+					"from": "agent_duplicate"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 280
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "mem_duplicate",
+			"provider": "memory_internal",
+			"config": {
+				"type": "memory_internal"
+			},
+			"control": [
+				{
+					"classType": "memory",
+					"from": "agent_duplicate"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 430,
+					"y": 280
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "response_findings",
+			"provider": "response_answers",
+			"config": {},
+			"input": [
+				{
+					"lane": "answers",
+					"from": "agent_duplicate"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 520,
+					"y": 200
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		}
+	],
+	"source": "chat_1",
+	"project_id": "fb345165-7d68-4cf9-8ccd-d965b9d085a5",
+	"viewport": {
+		"x": 0,
+		"y": 0,
+		"zoom": 1
+	},
+	"version": 1
+}

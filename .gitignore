@@ -1,0 +1,10 @@
+.rocketride/
+.env
+**/node_modules/
+**/dist/
+
+# run artefacts: keep the evidence, drop the noise
+out/*.log
+out/*.stdout
+out/raw_*.json
+.DS_Store

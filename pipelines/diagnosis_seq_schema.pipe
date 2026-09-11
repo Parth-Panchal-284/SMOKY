@@ -1,0 +1,154 @@
+{
+	"components": [
+		{
+			"id": "chat_1",
+			"provider": "chat",
+			"config": {
+				"hideForm": true,
+				"mode": "Source",
+				"parameters": {},
+				"type": "chat"
+			},
+			"ui": {
+				"position": {
+					"x": 20,
+					"y": 200
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "agent_schema",
+			"provider": "agent_rocketride",
+			"config": {
+				"instructions": [
+					"You are SCHEMA_MD, a data-quality specialist that audits structure only.",
+					"",
+					"- Check for: null / empty / placeholder values (\"\", \"NA\", \"null\", \"-\").",
+					"- Check for: type mismatches within a column (a number column holding text, etc).",
+					"- Check for: inconsistent formats in one column — especially dates written several ways (2024-01-05 vs 01/05/2024 vs Jan 5 2024).",
+					"- Check for: schema drift — a column whose values stop matching the shape the rest of the column follows.",
+					"- Use finding_type values like: null_values, type_mismatch, inconsistent_date_format, schema_drift.",
+					"- Propose fill_null_with for nulls, standardize_date_format for mixed dates, trim_normalize_whitespace for stray whitespace.",
+					"- Do NOT report duplicates or numeric outliers — other specialists own those.",
+					"",
+					"Return ONLY a JSON object, no prose and no markdown fence:",
+					"{\"agent\": \"SCHEMA_MD\", \"findings\": [ {",
+					"  \"finding_type\": \"<short_snake_case_kind>\",",
+					"  \"severity\": \"low\" | \"medium\" | \"high\",",
+					"  \"affected_columns\": [\"<column name>\", ...],",
+					"  \"affected_rows\": [<0-based row index>, ...],",
+					"  \"evidence\": \"<one sentence citing concrete values you saw>\",",
+					"  \"proposed_action\": \"trim_normalize_whitespace\" | \"standardize_date_format\" |",
+					"                     \"fill_null_with\" | \"merge_duplicate_rows\" | \"flag_outlier\" | \"none\"",
+					"} ]}",
+					"If you find nothing, return {\"agent\": \"SCHEMA_MD\", \"findings\": []}.",
+					"Never invent a row index or column name that is not in the data you were given."
+				],
+				"max_waves": 2,
+				"parameters": {}
+			},
+			"input": [
+				{
+					"lane": "questions",
+					"from": "chat_1"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 120
+				},
+				"measured": {
+					"width": 150,
+					"height": 86
+				}
+			}
+		},
+		{
+			"id": "llm_schema",
+			"provider": "llm_nebius",
+			"config": {
+				"profile": "custom",
+				"custom": {
+					"apikey": "${ROCKETRIDE_NEBIUS_KEY}",
+					"model": "nvidia/Nemotron-3_5-Lightning",
+					"base_url": "https://api.tokenfactory.nebius.com/v1/",
+					"modelTotalTokens": 131072
+				},
+				"parameters": {}
+			},
+			"control": [
+				{
+					"classType": "llm",
+					"from": "agent_schema"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 280
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "mem_schema",
+			"provider": "memory_internal",
+			"config": {
+				"type": "memory_internal"
+			},
+			"control": [
+				{
+					"classType": "memory",
+					"from": "agent_schema"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 430,
+					"y": 280
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "response_findings",
+			"provider": "response_answers",
+			"config": {},
+			"input": [
+				{
+					"lane": "answers",
+					"from": "agent_schema"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 520,
+					"y": 200
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		}
+	],
+	"source": "chat_1",
+	"project_id": "a892e272-d9f3-4593-a33a-0d3eaeecac43",
+	"viewport": {
+		"x": 0,
+		"y": 0,
+		"zoom": 1
+	},
+	"version": 1
+}

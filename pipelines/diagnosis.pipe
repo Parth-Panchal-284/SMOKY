@@ -1,0 +1,365 @@
+{
+	"components": [
+		{
+			"id": "chat_1",
+			"provider": "chat",
+			"config": {
+				"hideForm": true,
+				"mode": "Source",
+				"parameters": {},
+				"type": "chat"
+			},
+			"ui": {
+				"position": {
+					"x": 20,
+					"y": 200
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "agent_schema",
+			"provider": "agent_rocketride",
+			"config": {
+				"instructions": [
+					"You are SCHEMA_MD, a data-quality specialist that audits structure only.",
+					"",
+					"- Check for: null / empty / placeholder values (\"\", \"NA\", \"null\", \"-\").",
+					"- Check for: type mismatches within a column (a number column holding text, etc).",
+					"- Check for: inconsistent formats in one column — especially dates written several ways (2024-01-05 vs 01/05/2024 vs Jan 5 2024).",
+					"- Check for: schema drift — a column whose values stop matching the shape the rest of the column follows.",
+					"- Use finding_type values like: null_values, type_mismatch, inconsistent_date_format, schema_drift.",
+					"- Propose fill_null_with for nulls, standardize_date_format for mixed dates, trim_normalize_whitespace for stray whitespace.",
+					"- Do NOT report duplicates or numeric outliers — other specialists own those.",
+					"",
+					"Return ONLY a JSON object, no prose and no markdown fence:",
+					"{\"agent\": \"SCHEMA_MD\", \"findings\": [ {",
+					"  \"finding_type\": \"<short_snake_case_kind>\",",
+					"  \"severity\": \"low\" | \"medium\" | \"high\",",
+					"  \"affected_columns\": [\"<column name>\", ...],",
+					"  \"affected_rows\": [<0-based row index>, ...],",
+					"  \"evidence\": \"<one sentence citing concrete values you saw>\",",
+					"  \"proposed_action\": \"trim_normalize_whitespace\" | \"standardize_date_format\" |",
+					"                     \"fill_null_with\" | \"merge_duplicate_rows\" | \"flag_outlier\" | \"none\"",
+					"} ]}",
+					"If you find nothing, return {\"agent\": \"SCHEMA_MD\", \"findings\": []}.",
+					"Never invent a row index or column name that is not in the data you were given."
+				],
+				"max_waves": 2,
+				"parameters": {}
+			},
+			"input": [
+				{
+					"lane": "questions",
+					"from": "chat_1"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 120
+				},
+				"measured": {
+					"width": 150,
+					"height": 86
+				}
+			}
+		},
+		{
+			"id": "llm_schema",
+			"provider": "llm_nebius",
+			"config": {
+				"profile": "custom",
+				"custom": {
+					"apikey": "${ROCKETRIDE_NEBIUS_KEY}",
+					"model": "nvidia/Nemotron-3_5-Lightning",
+					"base_url": "https://api.tokenfactory.nebius.com/v1/",
+					"modelTotalTokens": 131072
+				},
+				"parameters": {}
+			},
+			"control": [
+				{
+					"classType": "llm",
+					"from": "agent_schema"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 280
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "mem_schema",
+			"provider": "memory_internal",
+			"config": {
+				"type": "memory_internal"
+			},
+			"control": [
+				{
+					"classType": "memory",
+					"from": "agent_schema"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 430,
+					"y": 280
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "agent_duplicate",
+			"provider": "agent_rocketride",
+			"config": {
+				"instructions": [
+					"You are DUPLICATE_MD, a data-quality specialist that finds duplicate and near-duplicate records.",
+					"",
+					"- Normalise text before comparing: trim, collapse inner whitespace, casefold, ignore punctuation.",
+					"- Find exact duplicate rows AND near-duplicates (same person/entity written differently: \"Jon Smith\" vs \"jon  smith\", \"ACME Inc\" vs \"Acme, Inc.\").",
+					"- Group candidates: every finding should list ALL row indices in the duplicate group in affected_rows.",
+					"- Do not flag a row as duplicate merely because one shared field matches — require the row to plausibly describe the same entity.",
+					"- Use finding_type values like: exact_duplicate, fuzzy_duplicate.",
+					"- Propose merge_duplicate_rows for groups you are confident about; propose \"none\" when it may be a legitimate re-entry and let the chief agent decide.",
+					"- Do NOT report nulls, formats or numeric outliers — other specialists own those.",
+					"",
+					"Return ONLY a JSON object, no prose and no markdown fence:",
+					"{\"agent\": \"DUPLICATE_MD\", \"findings\": [ {",
+					"  \"finding_type\": \"<short_snake_case_kind>\",",
+					"  \"severity\": \"low\" | \"medium\" | \"high\",",
+					"  \"affected_columns\": [\"<column name>\", ...],",
+					"  \"affected_rows\": [<0-based row index>, ...],",
+					"  \"evidence\": \"<one sentence citing concrete values you saw>\",",
+					"  \"proposed_action\": \"trim_normalize_whitespace\" | \"standardize_date_format\" |",
+					"                     \"fill_null_with\" | \"merge_duplicate_rows\" | \"flag_outlier\" | \"none\"",
+					"} ]}",
+					"If you find nothing, return {\"agent\": \"DUPLICATE_MD\", \"findings\": []}.",
+					"Never invent a row index or column name that is not in the data you were given."
+				],
+				"max_waves": 2,
+				"parameters": {}
+			},
+			"input": [
+				{
+					"lane": "questions",
+					"from": "chat_1"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 380
+				},
+				"measured": {
+					"width": 150,
+					"height": 86
+				}
+			}
+		},
+		{
+			"id": "llm_duplicate",
+			"provider": "llm_nebius",
+			"config": {
+				"profile": "custom",
+				"custom": {
+					"apikey": "${ROCKETRIDE_NEBIUS_KEY}",
+					"model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+					"base_url": "https://api.tokenfactory.nebius.com/v1/",
+					"modelTotalTokens": 131072
+				},
+				"parameters": {}
+			},
+			"control": [
+				{
+					"classType": "llm",
+					"from": "agent_duplicate"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 540
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "mem_duplicate",
+			"provider": "memory_internal",
+			"config": {
+				"type": "memory_internal"
+			},
+			"control": [
+				{
+					"classType": "memory",
+					"from": "agent_duplicate"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 430,
+					"y": 540
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "agent_anomaly",
+			"provider": "agent_rocketride",
+			"config": {
+				"instructions": [
+					"You are ANOMALY_MD, a data-quality specialist that finds statistical and business-rule outliers in numeric data.",
+					"",
+					"- For each numeric column compute quartiles and flag values outside [Q1 - k*IQR, Q3 + k*IQR].",
+					"- Also flag values outside the configured business ranges you are given, even when they sit inside the IQR fence.",
+					"- Report the actual offending value in evidence — never just \"an outlier was found\".",
+					"- Use finding_type values like: statistical_outlier, business_range_violation.",
+					"- Propose flag_outlier — NEVER propose mutating an outlier. Outliers are tagged for human review, not silently changed.",
+					"- Do NOT report nulls, formats or duplicates — other specialists own those.",
+					"- IQR multiplier k = 1.5.",
+					"- Business ranges (column -> allowed min/max): {\"age\":{\"min\":0,\"max\":120},\"amount\":{\"min\":0,\"max\":100000}}.",
+					"",
+					"Return ONLY a JSON object, no prose and no markdown fence:",
+					"{\"agent\": \"ANOMALY_MD\", \"findings\": [ {",
+					"  \"finding_type\": \"<short_snake_case_kind>\",",
+					"  \"severity\": \"low\" | \"medium\" | \"high\",",
+					"  \"affected_columns\": [\"<column name>\", ...],",
+					"  \"affected_rows\": [<0-based row index>, ...],",
+					"  \"evidence\": \"<one sentence citing concrete values you saw>\",",
+					"  \"proposed_action\": \"trim_normalize_whitespace\" | \"standardize_date_format\" |",
+					"                     \"fill_null_with\" | \"merge_duplicate_rows\" | \"flag_outlier\" | \"none\"",
+					"} ]}",
+					"If you find nothing, return {\"agent\": \"ANOMALY_MD\", \"findings\": []}.",
+					"Never invent a row index or column name that is not in the data you were given."
+				],
+				"max_waves": 2,
+				"parameters": {}
+			},
+			"input": [
+				{
+					"lane": "questions",
+					"from": "chat_1"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 640
+				},
+				"measured": {
+					"width": 150,
+					"height": 86
+				}
+			}
+		},
+		{
+			"id": "llm_anomaly",
+			"provider": "llm_nebius",
+			"config": {
+				"profile": "custom",
+				"custom": {
+					"apikey": "${ROCKETRIDE_NEBIUS_KEY}",
+					"model": "zai-org/GLM-5.3-Flash",
+					"base_url": "https://api.tokenfactory.nebius.com/v1/",
+					"modelTotalTokens": 131072
+				},
+				"parameters": {}
+			},
+			"control": [
+				{
+					"classType": "llm",
+					"from": "agent_anomaly"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 800
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "mem_anomaly",
+			"provider": "memory_internal",
+			"config": {
+				"type": "memory_internal"
+			},
+			"control": [
+				{
+					"classType": "memory",
+					"from": "agent_anomaly"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 430,
+					"y": 800
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "response_findings",
+			"provider": "response_answers",
+			"config": {},
+			"input": [
+				{
+					"lane": "answers",
+					"from": "agent_schema"
+				},
+				{
+					"lane": "answers",
+					"from": "agent_duplicate"
+				},
+				{
+					"lane": "answers",
+					"from": "agent_anomaly"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 520,
+					"y": 200
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		}
+	],
+	"source": "chat_1",
+	"project_id": "e0f4bac0-1e7d-40a2-9b1e-76774cde20ca",
+	"viewport": {
+		"x": 0,
+		"y": 0,
+		"zoom": 1
+	},
+	"version": 1
+}

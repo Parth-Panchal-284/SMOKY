@@ -1,0 +1,79 @@
+{
+	"llm": {
+		"provider": "llm_nebius",
+		"apikeyVar": "${ROCKETRIDE_NEBIUS_KEY}",
+		"defaultBaseUrl": "https://api.tokenfactory.nebius.com/v1/",
+		"_comment": "One model per agent, matched to the job. Throughput figures are Nebius Token Factory's published Tok/s \u2014 Llama-3.3-70B (25 Tok/s) was the original bottleneck.",
+		"agents": {
+			"SCHEMA_MD": {
+				"model": "nvidia/Nemotron-3_5-Lightning",
+				"modelTotalTokens": 131072,
+				"_why": "314 Tok/s, 30B MoE / 3B active. Schema+null+format checks are mechanical; speed dominates."
+			},
+			"DUPLICATE_MD": {
+				"model": "deepseek-ai/DeepSeek-V4-Flash-0731",
+				"modelTotalTokens": 131072,
+				"_why": "351 Tok/s, 1M context. Fuzzy duplicate grouping needs every row in view at once."
+			},
+			"ANOMALY_MD": {
+				"model": "zai-org/GLM-5.3-Flash",
+				"modelTotalTokens": 131072,
+				"_why": "349 Tok/s, 320B / 18B active. More active params for numeric/statistical reasoning, still fast."
+			},
+			"CHIEF": {
+				"model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+				"baseUrl": "https://api.tokenfactory.us-central1.nebius.com/v1/",
+				"modelTotalTokens": 131072,
+				"_why": "523 Tok/s, tuned for multi-agent + complex reasoning. Conflict arbitration is the hardest call in the system; runs once per run so cost is bounded. NOTE: regional endpoint."
+			}
+		}
+	},
+	"hotdata": {
+		"enabled": false,
+		"_comment": "Flip to true once the Hotdata half is ready. When false the specialists analyse the data slice passed in the question context and the harness uses the mock telemetry sink. When true the generator wires one db_hotdata node per specialist (its own isolated ephemeral DB) and the pipeline performs create -> query -> destroy natively.",
+		"apikeyVar": "${ROCKETRIDE_HOTDATA_KEY}",
+		"workspaceVar": "${ROCKETRIDE_HOTDATA_WORKSPACE}",
+		"ttl": "1h",
+		"allow_execute": true,
+		"allow_destructive_load": false,
+		"job_timeout_secs": 300,
+		"async_after_ms": 5000,
+		"max_attempts": 3,
+		"max_execute_rows": 25000
+	},
+	"anomaly": {
+		"iqrMultiplier": 1.5,
+		"businessRanges": {
+			"age": {
+				"min": 0,
+				"max": 120
+			},
+			"amount": {
+				"min": 0,
+				"max": 100000
+			}
+		}
+	},
+	"repair": {
+		"allowedTransforms": [
+			"trim_normalize_whitespace",
+			"standardize_date_format",
+			"fill_null_with",
+			"merge_duplicate_rows",
+			"flag_outlier"
+		],
+		"targetDateFormat": "YYYY-MM-DD",
+		"nullFillStrategy": "median",
+		"duplicateMergeStrategy": "keep_most_complete"
+	},
+	"verification": {
+		"maxRowLossRatio": 0.25,
+		"requireNoEmptyColumns": true,
+		"requireScoreNotWorse": true
+	},
+	"run": {
+		"ttlSeconds": 600,
+		"maxWaves": 2,
+		"agentTimeoutMs": 300000
+	}
+}
