@@ -91,7 +91,12 @@ function renderTable(ds) {
  * ephemeral db_hotdata database loaded with only its slice (src/slice.mjs).
  */
 function diagnosisQuestion(ds, spec = null) {
-	const q = new Question({ expectJson: true });
+	// NOT expectJson: the engine enforces strict JSON server-side and retries 4x
+	// before erroring. Reasoning models (Nemotron-Lightning, GLM-5.3-Flash)
+	// narrate before answering, so every one of those attempts is rejected and
+	// the whole specialist fails. Take the prose and extract client-side
+	// instead — extractJSON() strips reasoning and finds the payload.
+	const q = new Question();
 	q.addQuestion([
 		spec ? `Diagnose this dataset as ${spec.id}.` : 'Diagnose this dataset for your own specialty only.',
 		'',
@@ -107,7 +112,13 @@ function diagnosisQuestion(ds, spec = null) {
 async function runAgentsParallel(client, ds) {
 	const pipeline = buildParallel(cfg);
 	const t0 = performance.now();
-	const { token } = await client.use({ pipeline, ttl: cfg.run.ttlSeconds, name: `dataer-diagnosis-parallel-${runId}` });
+	// One execution thread per specialist — without this the server picks the
+	// thread count and the three agents can end up serialised inside the wave,
+	// which would make the parallel-vs-sequential comparison meaningless.
+	const { token } = await client.use({
+		pipeline, ttl: cfg.run.ttlSeconds, threads: Math.max(4, SPECIALISTS.length),
+		name: `dataer-diagnosis-parallel-${runId}`,
+	});
 	try {
 		// One wave: every specialist receives the same envelope and answers together.
 		const res = await withTimeout(
@@ -129,7 +140,10 @@ async function runAgentsSequential(client, ds) {
 		const a0 = performance.now();
 		let outcome = 'ok', text = null;
 		try {
-			const { token } = await client.use({ pipeline, ttl: cfg.run.ttlSeconds, name: `dataer-diagnosis-seq-${spec.id}-${runId}` });
+			const { token } = await client.use({
+				pipeline, ttl: cfg.run.ttlSeconds, threads: 1,
+				name: `dataer-diagnosis-seq-${spec.id}-${runId}`,
+			});
 			try {
 				const res = await withTimeout(
 					client.chat({ token, question: diagnosisQuestion(ds, spec) }),
@@ -197,7 +211,7 @@ async function runChief(client, findings) {
 	const t0 = performance.now();
 	const { token } = await client.use({ pipeline, ttl: cfg.run.ttlSeconds, name: `dataer-chief-${runId}` });
 	try {
-		const q = new Question({ expectJson: true });
+		const q = new Question();
 		q.addQuestion([
 			'Reconcile these specialist findings and return your decisions JSON.',
 			'',

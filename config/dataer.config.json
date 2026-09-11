@@ -6,9 +6,9 @@
 		"_comment": "One model per agent, matched to the job. Throughput figures are Nebius Token Factory's published Tok/s \u2014 Llama-3.3-70B (25 Tok/s) was the original bottleneck.",
 		"agents": {
 			"SCHEMA_MD": {
-				"model": "nvidia/Nemotron-3_5-Lightning",
+				"model": "Qwen/Qwen3-30B-A3B-Instruct-2507",
 				"modelTotalTokens": 131072,
-				"_why": "314 Tok/s, 30B MoE / 3B active. Schema+null+format checks are mechanical; speed dominates."
+				"_why": "70 Tok/s. INSTRUCT (non-thinking) variant - agent_rocketride requires strict JSON from its LLM, and reasoning models that narrate first are rejected by the engine after 4 retries. Qwen3-30B-A3B-Thinking would fail here; the Instruct one does not."
 			},
 			"DUPLICATE_MD": {
 				"model": "deepseek-ai/DeepSeek-V4-Flash-0731",
@@ -16,9 +16,9 @@
 				"_why": "351 Tok/s, 1M context. Fuzzy duplicate grouping needs every row in view at once."
 			},
 			"ANOMALY_MD": {
-				"model": "zai-org/GLM-5.3-Flash",
+				"model": "deepseek-ai/DeepSeek-V4-Flash-0731",
 				"modelTotalTokens": 131072,
-				"_why": "349 Tok/s, 320B / 18B active. More active params for numeric/statistical reasoning, still fast."
+				"_why": "351 Tok/s. Proven to return clean JSON under agent_rocketride in live runs; GLM-5.3-Flash narrated and was rejected."
 			},
 			"CHIEF": {
 				"model": "nvidia/Nemotron-3-Ultra-550b-a55b",

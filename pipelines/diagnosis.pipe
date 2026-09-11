@@ -46,7 +46,12 @@
 					"                     \"fill_null_with\" | \"merge_duplicate_rows\" | \"flag_outlier\" | \"none\"",
 					"} ]}",
 					"If you find nothing, return {\"agent\": \"SCHEMA_MD\", \"findings\": []}.",
-					"Never invent a row index or column name that is not in the data you were given."
+					"Never invent a row index or column name that is not in the data you were given.",
+					"",
+					"Output rules — these are strict:",
+					"- Your reply must START with { and END with }. Nothing before, nothing after.",
+					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
+					"- Do NOT wrap the JSON in markdown fences."
 				],
 				"max_waves": 2,
 				"parameters": {}
@@ -75,7 +80,7 @@
 				"profile": "custom",
 				"custom": {
 					"apikey": "${ROCKETRIDE_NEBIUS_KEY}",
-					"model": "nvidia/Nemotron-3_5-Lightning",
+					"model": "Qwen/Qwen3-30B-A3B-Instruct-2507",
 					"base_url": "https://api.tokenfactory.nebius.com/v1/",
 					"modelTotalTokens": 131072
 				},
@@ -147,7 +152,12 @@
 					"                     \"fill_null_with\" | \"merge_duplicate_rows\" | \"flag_outlier\" | \"none\"",
 					"} ]}",
 					"If you find nothing, return {\"agent\": \"DUPLICATE_MD\", \"findings\": []}.",
-					"Never invent a row index or column name that is not in the data you were given."
+					"Never invent a row index or column name that is not in the data you were given.",
+					"",
+					"Output rules — these are strict:",
+					"- Your reply must START with { and END with }. Nothing before, nothing after.",
+					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
+					"- Do NOT wrap the JSON in markdown fences."
 				],
 				"max_waves": 2,
 				"parameters": {}
@@ -249,7 +259,12 @@
 					"                     \"fill_null_with\" | \"merge_duplicate_rows\" | \"flag_outlier\" | \"none\"",
 					"} ]}",
 					"If you find nothing, return {\"agent\": \"ANOMALY_MD\", \"findings\": []}.",
-					"Never invent a row index or column name that is not in the data you were given."
+					"Never invent a row index or column name that is not in the data you were given.",
+					"",
+					"Output rules — these are strict:",
+					"- Your reply must START with { and END with }. Nothing before, nothing after.",
+					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
+					"- Do NOT wrap the JSON in markdown fences."
 				],
 				"max_waves": 2,
 				"parameters": {}
@@ -278,7 +293,7 @@
 				"profile": "custom",
 				"custom": {
 					"apikey": "${ROCKETRIDE_NEBIUS_KEY}",
-					"model": "zai-org/GLM-5.3-Flash",
+					"model": "deepseek-ai/DeepSeek-V4-Flash-0731",
 					"base_url": "https://api.tokenfactory.nebius.com/v1/",
 					"modelTotalTokens": 131072
 				},
@@ -355,7 +370,7 @@
 		}
 	],
 	"source": "chat_1",
-	"project_id": "e0f4bac0-1e7d-40a2-9b1e-76774cde20ca",
+	"project_id": "f37891d0-ed85-475c-8bb6-549d665361af",
 	"viewport": {
 		"x": 0,
 		"y": 0,

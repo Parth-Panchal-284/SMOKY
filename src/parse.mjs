@@ -23,13 +23,23 @@ export function extractJSON(value) {
 		}
 		return value;
 	}
-	const s = String(value);
+	let s = String(value);
+	// Reasoning models emit chain-of-thought before the answer. Strip it, or the
+	// braces inside the reasoning get parsed instead of the real payload.
+	s = s.replace(/<think>[\s\S]*?<\/think>/gi, '')
+		.replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '')
+		.replace(/^[\s\S]*?<\/think>/i, '')
+		.trim();
 	const fence = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
 	for (const c of [fence?.[1], s]) {
 		if (!c) continue;
 		try { return JSON.parse(c.trim()); } catch { /* fall through */ }
 		const a = c.indexOf('{'), b = c.lastIndexOf('}');
 		if (a >= 0 && b > a) { try { return JSON.parse(c.slice(a, b + 1)); } catch { /* fall through */ } }
+		// Scan for any balanced {...} block that actually carries our contract.
+		for (const m of c.matchAll(/\{[\s\S]*?"findings"[\s\S]*\}/g)) {
+			try { return JSON.parse(m[0]); } catch { /* keep scanning */ }
+		}
 	}
 	return null;
 }

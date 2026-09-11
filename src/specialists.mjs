@@ -22,7 +22,12 @@ export const FINDING_SHAPE = `{
 const OUTPUT_CONTRACT = `Return ONLY a JSON object, no prose and no markdown fence:
 {"agent": "<YOUR_AGENT_ID>", "findings": [ ${FINDING_SHAPE} ]}
 If you find nothing, return {"agent": "<YOUR_AGENT_ID>", "findings": []}.
-Never invent a row index or column name that is not in the data you were given.`;
+Never invent a row index or column name that is not in the data you were given.
+
+Output rules — these are strict:
+- Your reply must START with { and END with }. Nothing before, nothing after.
+- Do NOT narrate, do NOT explain your reasoning, do NOT write "Here's a thinking process".
+- Do NOT wrap the JSON in markdown fences.`;
 
 export const SPECIALISTS = [
 	{

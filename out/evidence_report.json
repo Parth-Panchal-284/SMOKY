@@ -1,5 +1,5 @@
 {
-  "run_id": "run_20260911205934",
+  "run_id": "run_20260911212550",
   "mode_used_for_findings": "parallel",
   "timings": [
     {
@@ -160,7 +160,7 @@
       "before_value": "01/05/2024",
       "after_value": "2024-01-05",
       "finding_id": 0,
-      "at": "2026-09-11T20:59:34.488Z"
+      "at": "2026-09-11T21:25:50.146Z"
     },
     {
       "row": 5,
@@ -169,7 +169,7 @@
       "before_value": "Mar 3 2024",
       "after_value": "2024-03-03",
       "finding_id": 0,
-      "at": "2026-09-11T20:59:34.488Z"
+      "at": "2026-09-11T21:25:50.146Z"
     },
     {
       "row": 9,
@@ -178,7 +178,7 @@
       "before_value": "03/22/2024",
       "after_value": "2024-03-22",
       "finding_id": 0,
-      "at": "2026-09-11T20:59:34.488Z"
+      "at": "2026-09-11T21:25:50.146Z"
     },
     {
       "row": 4,
@@ -187,7 +187,7 @@
       "before_value": "",
       "after_value": "35.5",
       "finding_id": 1,
-      "at": "2026-09-11T20:59:34.488Z"
+      "at": "2026-09-11T21:25:50.146Z"
     },
     {
       "row": 11,
@@ -196,7 +196,7 @@
       "before_value": "",
       "after_value": "35.5",
       "finding_id": 1,
-      "at": "2026-09-11T20:59:34.488Z"
+      "at": "2026-09-11T21:25:50.146Z"
     },
     {
       "row": 9,
@@ -205,7 +205,7 @@
       "before_value": "NA",
       "after_value": "155.25",
       "finding_id": 1,
-      "at": "2026-09-11T20:59:34.488Z"
+      "at": "2026-09-11T21:25:50.146Z"
     },
     {
       "row": 7,
@@ -214,7 +214,7 @@
       "before_value": "{\"id\":\"8\",\"name\":\"Maria  Garcia \",\"email\":\"maria.garcia@example.com\",\"signup_date\":\"2024-01-06\",\"age\":\"29\",\"amount\":\"89.00\",\"city\":\"Oakland\"}",
       "after_value": null,
       "finding_id": 2,
-      "at": "2026-09-11T20:59:34.488Z",
+      "at": "2026-09-11T21:25:50.146Z",
       "dropped": true
     },
     {
@@ -224,7 +224,7 @@
       "before_value": "",
       "after_value": "outlier:age",
       "finding_id": 3,
-      "at": "2026-09-11T20:59:34.488Z"
+      "at": "2026-09-11T21:25:50.146Z"
     }
   ],
   "rejected_decisions": [],

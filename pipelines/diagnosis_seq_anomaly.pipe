@@ -47,7 +47,12 @@
 					"                     \"fill_null_with\" | \"merge_duplicate_rows\" | \"flag_outlier\" | \"none\"",
 					"} ]}",
 					"If you find nothing, return {\"agent\": \"ANOMALY_MD\", \"findings\": []}.",
-					"Never invent a row index or column name that is not in the data you were given."
+					"Never invent a row index or column name that is not in the data you were given.",
+					"",
+					"Output rules — these are strict:",
+					"- Your reply must START with { and END with }. Nothing before, nothing after.",
+					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
+					"- Do NOT wrap the JSON in markdown fences."
 				],
 				"max_waves": 2,
 				"parameters": {}
@@ -76,7 +81,7 @@
 				"profile": "custom",
 				"custom": {
 					"apikey": "${ROCKETRIDE_NEBIUS_KEY}",
-					"model": "zai-org/GLM-5.3-Flash",
+					"model": "deepseek-ai/DeepSeek-V4-Flash-0731",
 					"base_url": "https://api.tokenfactory.nebius.com/v1/",
 					"modelTotalTokens": 131072
 				},
@@ -145,7 +150,7 @@
 		}
 	],
 	"source": "chat_1",
-	"project_id": "f4464bbb-e807-49a2-8370-15a0df8a9261",
+	"project_id": "34e45042-0134-4b8d-ab9a-de444117f21c",
 	"viewport": {
 		"x": 0,
 		"y": 0,
