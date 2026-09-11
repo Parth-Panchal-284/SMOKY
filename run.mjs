@@ -39,6 +39,10 @@ const hot = makeHotdata(cfg);
 // Unbuffered progress log: node block-buffers stdout when it is not a TTY, so a
 // long run shows nothing until it exits. appendFileSync flushes immediately.
 const LOGFILE = dryRun ? 'out/run.dryrun.log' : 'out/run.log';
+// Truncate at start: the log is a LIVE view of THIS run. Appending across runs
+// made the console show a previous run's output above the current one, which
+// reads as a broken UI.
+try { mkdirSync('out', { recursive: true }); writeFileSync(LOGFILE, ''); } catch { /* non-fatal */ }
 /** Bound any agent call so one slow wave cannot hang the demo. Rejects rather
  *  than resolving, so the caller's failure-isolation path handles it. */
 function withTimeout(promise, ms, label) {

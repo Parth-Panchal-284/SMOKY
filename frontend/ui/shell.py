@@ -57,7 +57,7 @@ FILTER_JS = """
 """
 
 
-def render_app_html(state: RunState) -> str:
+def render_app_html(state: RunState, current: str = "operating") -> str:
     cards = "".join(render_specialist_card(a) for a in state.agents())
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -70,7 +70,7 @@ def render_app_html(state: RunState) -> str:
 <body>
   <div class="app">
     {render_header(state)}
-    {render_sidebar()}
+    {render_sidebar(current)}
     <main class="main">
       <div class="main-grid">
         {render_operation_header(state)}
@@ -84,4 +84,32 @@ def render_app_html(state: RunState) -> str:
   {FILTER_JS}
 </body>
 </html>
+"""
+
+
+def render_app_fragment(state: RunState, current: str = "operating") -> str:
+    """The same console, WITHOUT the document wrapper.
+
+    st.iframe sandboxes its frame: links cannot escape it (so the sidebar could
+    not navigate) and the host page needs chrome-hiding CSS that also flattens
+    every native Streamlit widget. Rendering the markup inline instead makes the
+    sidebar plain same-page anchors and leaves Streamlit's own widgets usable.
+    """
+    cards = "".join(render_specialist_card(a) for a in state.agents())
+    return f"""
+{FONT_LINKS}
+<style>{APP_CSS}</style>
+<div class="app">
+  {render_header(state)}
+  {render_sidebar(current)}
+  <main class="main">
+    <div class="main-grid">
+      {render_operation_header(state)}
+      {cards}
+      {render_patient_vitals(state)}
+      {render_event_feed(state)}
+      {render_pipeline(state)}
+    </div>
+  </main>
+</div>
 """

@@ -67,6 +67,47 @@ def live_log(tail: int = 40) -> str:
         return ""
 
 
+STAGE_ORDER = ["intake", "diagnose", "chief", "repair", "verify", "discharge"]
+STAGE_LABEL = {
+    "intake": "Intake — profiling the dataset",
+    "diagnose": "Diagnose — specialists running",
+    "chief": "Chief — reconciling findings",
+    "repair": "Repair — applying allow-listed fixes",
+    "verify": "Verify — checking invariants",
+    "discharge": "Discharge — complete",
+}
+
+
+def progress() -> dict[str, Any]:
+    """A clean status summary for the console — never a raw log dump."""
+    text = live_log(400)
+    stage = stage_from_log(text)
+    findings = None
+    for line in text.splitlines():
+        if "findings:" in line:
+            try:
+                findings = int(line.split("findings:")[1].strip().split()[0])
+            except Exception:
+                pass
+    return {
+        "running": is_running(),
+        "stage": stage,
+        "stage_label": STAGE_LABEL.get(stage, stage),
+        "step": STAGE_ORDER.index(stage) + 1 if stage in STAGE_ORDER else 1,
+        "steps": len(STAGE_ORDER),
+        "findings": findings,
+        "tail": "\n".join(text.splitlines()[-12:]),
+    }
+
+
+def stop_run() -> bool:
+    try:
+        subprocess.run(["pkill", "-f", "run.mjs"], timeout=5)
+        return True
+    except Exception:
+        return False
+
+
 def stage_from_log(text: str) -> str:
     """Map harness output onto the console's six stages."""
     if not text:

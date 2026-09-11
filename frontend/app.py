@@ -23,7 +23,6 @@ from services.backend_client import poll_events, ROOT, TELEMETRY, EVIDENCE
 from services.telemetry import load as load_telemetry
 from services import runner
 from ui.shell import render_app_html
-from ui.styles import STREAMLIT_CHROME_CSS
 
 st.set_page_config(
     layout="wide",
@@ -32,36 +31,29 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-st.markdown(STREAMLIT_CHROME_CSS, unsafe_allow_html=True)
-
-# The shell CSS zeroes block padding and vertical gaps to make the iframe sit
-# flush, which also flattens any native Streamlit widget to nothing. The page
-# selector has to opt back out of that.
+# Hide only Streamlit's own chrome. Deliberately NOT the blanket rule the iframe
+# version needed -- that also flattened every native widget to zero height.
 st.markdown(
     """
 <style>
-  div[data-testid="stHorizontalBlock"]:has(div[data-testid="stRadio"]),
-  div[data-testid="stRadio"] { display: block !important; visibility: visible !important; }
-  div[data-testid="stRadio"] {
-    background: #fff; border-bottom: 1px solid #E6EEF6;
-    padding: 8px 20px 6px !important; margin: 0 !important;
-  }
-  div[data-testid="stRadio"] > div { gap: 6px !important; flex-wrap: wrap; }
-  div[data-testid="stRadio"] label {
-    font-size: 12.5px !important; font-weight: 600;
-    padding: 5px 12px !important; border-radius: 7px;
-    border: 1px solid #E6EEF6; background: #F6F8FB; cursor: pointer;
-  }
-  div[data-testid="stRadio"] label:hover { border-color: #16A34A; }
-  /* the page bodies (not the iframe) need their padding back */
-  div[data-testid="stVerticalBlock"]:has(> div [data-testid="stDataFrame"]),
-  div[data-testid="stVerticalBlock"]:has(> div [data-testid="stMetric"]) {
-    padding: 10px 20px !important; gap: 10px !important;
-  }
-  [data-testid="stMetric"] {
-    background: #fff; border: 1px solid #E6EEF6; border-radius: 9px; padding: 10px 12px !important;
-  }
-  h3, .stSubheader { padding: 12px 20px 0 !important; }
+  #MainMenu, footer, header[data-testid="stHeader"], .stDeployButton,
+  [data-testid="stToolbar"], [data-testid="stDecoration"],
+  [data-testid="stStatusWidget"] { display: none !important; }
+  .stApp { background: #F6F8FB !important; }
+  .block-container { padding: 0 !important; max-width: 100% !important; }
+  .rr-nav { background:#fff; border-bottom:1px solid #E6EEF6; padding:10px 22px;
+            font:600 12.5px/1.2 system-ui,-apple-system,sans-serif; }
+  .rr-nav a { color:#5B6B7F; text-decoration:none; }
+  .rr-nav a:hover { color:#16A34A; }
+  [data-testid="stMetric"] { background:#fff; border:1px solid #E6EEF6;
+                             border-radius:10px; padding:12px 14px !important; }
+  section.main > div, div[data-testid="stVerticalBlock"] { gap: 6px !important; }
+  iframe { border: none !important; }
+  /* nav buttons: visible, compact, always on top of the console */
+  div[data-testid="stHorizontalBlock"]:first-of-type { padding: 8px 18px 4px; background:#fff;
+      border-bottom:1px solid #E6EEF6; }
+  div[data-testid="stHorizontalBlock"]:first-of-type button { font-size:12.5px !important;
+      padding:4px 10px !important; }
 </style>
 """,
     unsafe_allow_html=True,
@@ -137,15 +129,39 @@ def _csv_rows(path: Path) -> tuple[list[str], list[dict]]:
 def operating_room() -> None:
     try:
         if runner.is_running():
-            st.info(
-                f"Pipeline running — stage: **{runner.stage_from_log(runner.live_log(60))}**",
-                icon="🩺",
-            )
+            p = runner.progress()
+            st.progress(p["step"] / p["steps"],
+                        text=f"Stage {p['step']}/{p['steps']} — {p['stage_label']}")
         state = _tick()
-        html = render_app_html(state)
+        html = render_app_html(state, "operating")
         st.iframe(html, width="stretch", height=920)
     except Exception as exc:  # noqa: BLE001 — surface demo failures in the UI
         st.exception(exc)
+
+
+@st.fragment(run_every=2.0)
+def _progress_panel() -> None:
+    """Clean status, not a log dump. Auto-refreshes while a run is live."""
+    p = runner.progress()
+    if not p["running"]:
+        st.success("Diagnosis complete.")
+        st.markdown("[→ See it in Results](?page=results) &nbsp;·&nbsp; [→ Operating Room](?page=operating)")
+        return
+
+    st.progress(p["step"] / p["steps"], text=f"Stage {p['step']}/{p['steps']} — {p['stage_label']}")
+    cols = st.columns(len(runner.STAGE_ORDER))
+    for i, stage in enumerate(runner.STAGE_ORDER):
+        mark = "✅" if i + 1 < p["step"] else ("🔵" if i + 1 == p["step"] else "⚪")
+        cols[i].markdown(f"<div style='text-align:center;font-size:11px'>{mark}<br>{stage}</div>",
+                         unsafe_allow_html=True)
+    if p["findings"] is not None:
+        st.caption(f"{p['findings']} findings so far")
+    st.markdown("[→ Watch in the Operating Room](?page=operating)")
+    with st.expander("Harness output"):
+        st.code(p["tail"] or "starting…", language="text")
+    if st.button("Stop run", type="secondary"):
+        runner.stop_run()
+        st.rerun()
 
 
 def triage() -> None:
@@ -178,9 +194,7 @@ def triage() -> None:
         st.rerun()
 
     if running:
-        st.warning("A diagnosis is already in progress.")
-        st.markdown("[→ Operating Room](?page=operating)")
-        st.code(runner.live_log(18) or "starting…", language="text")
+        _progress_panel()
 
     st.divider()
     ev = _evidence()
@@ -389,17 +403,20 @@ current = str(qp.get("page") or "operating").lower()
 if current not in KEYS:
     current = "operating"
 
-nav = " &nbsp;·&nbsp; ".join(
-    (f"<b style='color:#16A34A'>{LABELS[k]}</b>" if k == current
-     else f"<a href='?page={k}' target='_self' style='color:#5B6B7F;text-decoration:none'>{LABELS[k]}</a>")
-    for k in KEYS
-)
-st.markdown(
-    "<div style=\"background:#fff;border-bottom:1px solid #E6EEF6;padding:9px 20px;"
-    "font:600 12.5px/1.2 system-ui,sans-serif;position:sticky;top:0;z-index:999\">"
-    + nav + "</div>",
-    unsafe_allow_html=True,
-)
+# The Operating Room carries its own sidebar, which is now real navigation
+# (anchors with target="_top" — see ui/sidebar.py). The other screens are plain
+# Streamlit, so they get a markdown strip. Raw <a> is used rather than
+# st.link_button because the shell CSS hides native widgets outright.
+cols = st.columns(len(KEYS))
+for _i, _k in enumerate(KEYS):
+    if cols[_i].button(
+        LABELS[_k],
+        key=f"nav_{_k}",
+        width="stretch",
+        type="primary" if _k == current else "secondary",
+    ):
+        st.query_params["page"] = _k
+        st.rerun()
 
 if current == "triage":
     triage()

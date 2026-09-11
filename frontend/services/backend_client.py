@@ -20,7 +20,9 @@ import os
 from pathlib import Path
 from typing import Any
 
-DEMO_MODE = True
+# Live by default: this console reads real RocketRide runs.
+# Set DATA_ER_DEMO_MODE=1 to fall back to the canned timeline.
+DEMO_MODE = False
 _env = os.environ.get("DATA_ER_DEMO_MODE")
 if _env is not None:
     DEMO_MODE = _env.strip() not in {"0", "false", "False", "no"}

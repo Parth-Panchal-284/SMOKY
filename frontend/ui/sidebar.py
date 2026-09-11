@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+# (number, title, subtitle, icon, page-key). The page key drives ?page=<key>.
 NAV = [
-    ("01", "Triage", "Upload & Profile", "home", False),
-    ("02", "Operating Room", "Live Diagnostics", "heart", True),
-    ("03", "Chief Review", "Resolve & Approve", "users", False),
-    ("04", "Results", "Report & Export", "report", False),
-    ("05", "Telemetry", "Agent Performance", "chart", False),
+    ("01", "Triage", "Upload & Profile", "home", "triage"),
+    ("02", "Operating Room", "Live Diagnostics", "heart", "operating"),
+    ("03", "Chief Review", "Resolve & Approve", "users", "chief"),
+    ("04", "Results", "Report & Export", "report", "results"),
+    ("05", "Telemetry", "Agent Performance", "chart", "telemetry"),
 ]
 
 ICONS = {
@@ -26,21 +27,29 @@ FOOT_ECG = """
 """
 
 
-def render_sidebar() -> str:
+def render_sidebar(current: str = "operating") -> str:
+    """Real navigation.
+
+    The console renders inside an iframe, so each item is an anchor with
+    target="_top": without it the click would reload the iframe's own src
+    instead of moving the parent page, which looks like a broken app.
+    """
     items = []
-    for num, title, sub, icon, active in NAV:
+    for num, title, sub, icon, key in NAV:
+            active = key == current
             cls = "nav-item active" if active else "nav-item"
             num_html = "" if active else f'<span class="num">{num}</span>'
             items.append(
                 f"""
-                <div class="{cls}" title="{title}">
+                <a class="{cls}" title="{title}" href="?page={key}"
+                   style="text-decoration:none;color:inherit;cursor:pointer">
                   {num_html}
                   <span class="nav-ico">{ICONS[icon]}</span>
                   <span class="nav-text">
                     <span class="nav-title">{title}</span>
                     <span class="nav-sub">{sub}</span>
                   </span>
-                </div>
+                </a>
                 """
             )
     return f"""
