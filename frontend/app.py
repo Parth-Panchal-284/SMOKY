@@ -45,6 +45,28 @@ st.markdown(
             font:600 12.5px/1.2 system-ui,-apple-system,sans-serif; }
   .rr-nav a { color:#5B6B7F; text-decoration:none; }
   .rr-nav a:hover { color:#16A34A; }
+  .rr-rail { background:#fff; border:1px solid #E6EEF6; border-radius:12px;
+             padding:14px 18px 10px; margin:10px 18px; }
+  .rr-rail-head { display:flex; align-items:center; gap:10px; margin-bottom:9px; }
+  .rr-rail-title { font:600 13px system-ui,-apple-system,sans-serif; color:#0F172A; }
+  .rr-rail-pct { margin-left:auto; font:700 12px ui-monospace,monospace; color:#16A34A; }
+  .rr-badge { font:600 10.5px system-ui; background:#ECFDF5; color:#16A34A;
+              border:1px solid #A7F3D0; border-radius:20px; padding:2px 9px; }
+  .rr-track { height:5px; background:#EEF2F7; border-radius:4px; overflow:hidden; }
+  .rr-fill { height:100%; background:linear-gradient(90deg,#16A34A,#4ADE80);
+             border-radius:4px; transition:width .5s cubic-bezier(.22,1,.36,1); }
+  .rr-stages { display:flex; justify-content:space-between; margin-top:11px; }
+  .rr-stage { flex:1; text-align:center; }
+  .rr-dot { display:inline-flex; align-items:center; justify-content:center;
+            width:19px; height:19px; border-radius:50%; font-size:10.5px;
+            font-weight:700; line-height:1; }
+  .rr-done .rr-dot { background:#16A34A; color:#fff; }
+  .rr-live .rr-dot { background:#fff; border:2.5px solid #16A34A; color:#16A34A;
+                     box-shadow:0 0 0 4px rgba(22,163,74,.14); }
+  .rr-todo .rr-dot { background:#fff; border:2px solid #E2E8F0; }
+  .rr-lbl { display:block; margin-top:5px; font:600 10.5px system-ui;
+            text-transform:uppercase; letter-spacing:.04em; color:#94A3B8; }
+  .rr-done .rr-lbl, .rr-live .rr-lbl { color:#0F172A; }
   [data-testid="stMetric"] { background:#fff; border:1px solid #E6EEF6;
                              border-radius:10px; padding:12px 14px !important; }
   section.main > div, div[data-testid="stVerticalBlock"] { gap: 6px !important; }
@@ -141,25 +163,51 @@ def operating_room() -> None:
 
 @st.fragment(run_every=2.0)
 def _progress_panel() -> None:
-    """Clean status, not a log dump. Auto-refreshes while a run is live."""
+    """Live stage rail. Rendered as one HTML block rather than st.columns so the
+    connecting track lines up and the labels cannot wrap independently."""
     p = runner.progress()
-    if not p["running"]:
-        st.success("Diagnosis complete.")
-        st.markdown("[→ See it in Results](?page=results) &nbsp;·&nbsp; [→ Operating Room](?page=operating)")
-        return
+    done = not p["running"]
+    step = p["steps"] if done else p["step"]
 
-    st.progress(p["step"] / p["steps"], text=f"Stage {p['step']}/{p['steps']} — {p['stage_label']}")
-    cols = st.columns(len(runner.STAGE_ORDER))
+    chips = []
     for i, stage in enumerate(runner.STAGE_ORDER):
-        mark = "✅" if i + 1 < p["step"] else ("🔵" if i + 1 == p["step"] else "⚪")
-        cols[i].markdown(f"<div style='text-align:center;font-size:11px'>{mark}<br>{stage}</div>",
-                         unsafe_allow_html=True)
-    if p["findings"] is not None:
-        st.caption(f"{p['findings']} findings so far")
-    st.markdown("[→ Watch in the Operating Room](?page=operating)")
+        n = i + 1
+        if n < step or done:
+            dot, cls = "&#10003;", "rr-done"
+        elif n == step:
+            dot, cls = "&#9679;", "rr-live"
+        else:
+            dot, cls = "", "rr-todo"
+        chips.append(
+            f"<div class='rr-stage {cls}'><span class='rr-dot'>{dot}</span>"
+            f"<span class='rr-lbl'>{stage}</span></div>"
+        )
+
+    pct = int(100 * step / p["steps"])
+    head = ("Diagnosis complete" if done
+            else f"Stage {p['step']}/{p['steps']} &middot; {p['stage_label']}")
+    found = f"<span class='rr-badge'>{p['findings']} findings</span>" if p["findings"] is not None else ""
+
+    st.markdown(
+        f"""
+<div class="rr-rail">
+  <div class="rr-rail-head">
+    <span class="rr-rail-title">{head}</span>{found}
+    <span class="rr-rail-pct">{pct}%</span>
+  </div>
+  <div class="rr-track"><div class="rr-fill" style="width:{pct}%"></div></div>
+  <div class="rr-stages">{''.join(chips)}</div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+    if done:
+        st.success("Run finished — open Results for the evidence report.")
+        return
     with st.expander("Harness output"):
         st.code(p["tail"] or "starting…", language="text")
-    if st.button("Stop run", type="secondary"):
+    if st.button("Stop run"):
         runner.stop_run()
         st.rerun()
 

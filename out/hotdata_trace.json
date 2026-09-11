@@ -1,0 +1,11 @@
+{
+  "answers": [
+    "{\"agent\": \"SCHEMA_MD\", \"findings\": [{\"finding_type\": \"null_values\", \"severity\": \"high\", \"affected_columns\": [\"email\", \"age\", \"amount\"], \"affected_rows\": [4, 5, 9, 11], \"evidence\": \"Row 4 has an empty email ('') and empty age (''), row 5 has a placeholder 'NA' in amount, row 9 has an empty age (''), and row 11 has an empty age ('').\", \"proposed_action\": \"fill_null_with\"}, {\"finding_type\": \"inconsistent_date_format\", \"severity\": \"high\", \"affected_columns\": [\"signup_date\"], \"affected_rows\": [2, 5, 9], \"evidence\": \"Row 2 has signup_date in format '01/05/2024', row 5 has 'Mar 3 2024', and row 9 has '03/22/2024', which differ from the standard 'YYYY-MM-DD' format used elsewhere.\", \"proposed_action\": \"standardize_date_format\"}, {\"finding_type\": \"type_mismatch\", \"severity\": \"medium\", \"affected_columns\": [\"age\"], \"affected_rows\": [9], \"evidence\": \"Row 9 has age value '200', which is numerically valid but likely an outlier in context, though not a type mismatch per se; however, the value is stored as a string and may be misinterpreted as a string type.\", \"proposed_action\": \"none\"}, {\"finding_type\": \"schema_drift\", \"severity\": \"high\", \"affected_columns\": [\"name\", \"email\", \"city\"], \"affected_rows\": [2, 8], \"evidence\": \"Row 2 has name 'jon  smith' (lowercase with extra space), email 'JON.SMITH@example.com' (uppercase), and city 'san jose' (lowercase), differing from the consistent capitalization and spacing in other rows.\", \"proposed_action\": \"trim_normalize_whitespace\"}]}"
+  ],
+  "name": "Question 1",
+  "path": "",
+  "result_types": {
+    "answers": "answers"
+  },
+  "objectId": "ecbe44a8-fc58-5a88-a4eb-ef17ab1518f0"
+}
