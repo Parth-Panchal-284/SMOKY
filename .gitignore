@@ -9,3 +9,6 @@ out/*.stdout
 out/raw_*.json
 .DS_Store
 frontend/**/__pycache__/
+data/uploads/
+out/runs/
+out/*.stdout

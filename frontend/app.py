@@ -21,6 +21,7 @@ import streamlit as st
 from models.run_state import RunState, apply_event
 from services.backend_client import poll_events, ROOT, TELEMETRY, EVIDENCE
 from services.telemetry import load as load_telemetry
+from services import runner
 from ui.shell import render_app_html
 from ui.styles import STREAMLIT_CHROME_CSS
 
@@ -135,6 +136,11 @@ def _csv_rows(path: Path) -> tuple[list[str], list[dict]]:
 @st.fragment(run_every=1.0)
 def operating_room() -> None:
     try:
+        if runner.is_running():
+            st.info(
+                f"Pipeline running — stage: **{runner.stage_from_log(runner.live_log(60))}**",
+                icon="🩺",
+            )
         state = _tick()
         html = render_app_html(state)
         st.iframe(html, width="stretch", height=920)
@@ -143,22 +149,50 @@ def operating_room() -> None:
 
 
 def triage() -> None:
+    """Entry point of the flow: give me a dataset, and I start the pipeline."""
     st.subheader("Triage — Upload & Profile")
+
+    running = runner.is_running()
+    up = st.file_uploader("Upload a CSV to admit", type=["csv"], disabled=running)
+
+    col = st.columns([1, 1, 2])
+    mode = col[0].selectbox("Mode", ["both", "parallel", "sequential"], disabled=running)
+    use_sample = col[1].button("Use sample dataset", disabled=running)
+
+    src: Path | None = None
+    if up is not None:
+        src = runner.save_upload(up.name, up.getvalue())
+        st.success(f"Admitted `{up.name}` — {len(up.getvalue())} bytes")
+    elif use_sample:
+        src = ROOT / "data" / "sample.csv"
+
+    if src is not None and not running:
+        info = runner.start_run(src, mode)
+        st.session_state.active_run = info["run_id"]
+        # Reset the Operating Room clock so the new run animates from t=0.
+        st.session_state.pop("run_state", None)
+        st.session_state.event_cursor = -1.0
+        st.session_state.demo_t0 = time.time()
+        st.success(f"Started **{info['run_id']}** — `{info['cmd']}`")
+        st.markdown("[→ Watch it in the Operating Room](?page=operating)")
+        st.rerun()
+
+    if running:
+        st.warning("A diagnosis is already in progress.")
+        st.markdown("[→ Operating Room](?page=operating)")
+        st.code(runner.live_log(18) or "starting…", language="text")
+
+    st.divider()
     ev = _evidence()
-    src = ROOT / "data" / "sample.csv"
-    header, rows = _csv_rows(src)
-
+    preview = src or (ROOT / "data" / "sample.csv")
+    header, rows = _csv_rows(preview)
     c = st.columns(4)
-    c[0].metric("Rows", ev.get("rows_before", len(rows)))
+    c[0].metric("Rows", len(rows))
     c[1].metric("Columns", len(header))
-    c[2].metric("Baseline health", ev.get("before_score", "—"))
-    c[3].metric("Dataset", src.name)
-
-    st.caption(f"Source: `{src}` — the dataset the last run diagnosed.")
+    c[2].metric("Last baseline health", ev.get("before_score", "—"))
+    c[3].metric("Preview", preview.name)
     if rows:
-        st.dataframe(rows, width="stretch", height=420)
-    else:
-        st.info("No dataset found. Run the harness first.")
+        st.dataframe(rows, width="stretch", height=320)
 
 
 def chief_review() -> None:
@@ -198,12 +232,27 @@ def chief_review() -> None:
 
 
 def results() -> None:
+    """Past results, newest first — every archived run, not just the last."""
     st.subheader("Results — Report & Export")
-    ev = _evidence()
+    runs = runner.past_runs()
+    if not runs:
+        st.info("No completed runs yet. Admit a dataset in Triage.")
+        return
+
+    labels = [
+        f"{r.get('run_id','?')}  ·  {r.get('_when','')}  ·  "
+        f"health {r.get('before_score','—')}→{r.get('after_score','—')}  ·  "
+        f"{r.get('total_findings',0)} findings"
+        for r in runs
+    ]
+    idx = st.selectbox(
+        "Past runs", range(len(runs)), format_func=lambda i: labels[i]
+    )
+    ev = runs[idx]
+
     before = ev.get("before_score", 0)
     after = ev.get("after_score", 0)
     rolled = ev.get("rollback_triggered")
-
     c = st.columns(4)
     c[0].metric("Health", after, delta=round(after - before, 1) if before else None)
     c[1].metric("Rows", f"{ev.get('rows_before','—')} → {ev.get('rows_after','—')}")
@@ -218,21 +267,26 @@ def results() -> None:
     st.markdown("**Audit trail** — every change, with before and after values")
     audit = ev.get("audit_trail") or []
     if audit:
-        st.dataframe(audit, width="stretch", height=300)
+        st.dataframe(audit, width="stretch", height=280)
     else:
-        st.info("No changes were applied in the last run.")
+        st.info("No changes were applied in this run.")
 
-    cleaned = ROOT / "out" / "cleaned.csv"
-    if cleaned.exists():
-        st.download_button(
-            "Download cleaned.csv", cleaned.read_bytes(),
-            file_name="cleaned.csv", mime="text/csv",
+    review = ev.get("review_queue") or []
+    if review:
+        st.markdown("**Review queue** — flagged for a human, not auto-fixed")
+        st.dataframe(
+            [{"#": r.get("finding_index"), "reasoning": str(r.get("reasoning", ""))[:160]} for r in review],
+            width="stretch",
         )
-    if EVIDENCE.exists():
-        st.download_button(
-            "Download evidence_report.json", EVIDENCE.read_bytes(),
-            file_name="evidence_report.json", mime="application/json",
-        )
+
+    csvp = Path(ev.get("_csv", ""))
+    if csvp.exists():
+        st.download_button("Download cleaned.csv", csvp.read_bytes(),
+                           file_name=f"{ev.get('run_id','cleaned')}.csv", mime="text/csv")
+    jp = Path(ev.get("_path", ""))
+    if jp.exists():
+        st.download_button("Download evidence_report.json", jp.read_bytes(),
+                           file_name=f"{ev.get('run_id','evidence')}.json", mime="application/json")
 
 
 @st.fragment(run_every=3.0)

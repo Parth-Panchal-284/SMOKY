@@ -1,29 +1,25 @@
 {
-  "run_id": "run_demo_144847",
+  "run_id": "run_hotdata_seq_145306",
   "mode_used_for_findings": "sequential",
   "timings": [
     {
-      "mode": "parallel",
-      "duration_ms": 49575
-    },
-    {
       "mode": "sequential",
-      "duration_ms": 80311
+      "duration_ms": 155832
     }
   ],
   "before_score": 91.8,
-  "after_score": 92.9,
+  "after_score": 99.4,
   "rollback_triggered": false,
   "invariants": [
     {
       "name": "row_loss_explained",
       "ok": true,
-      "detail": "lost 0 row(s); 0 explained by merge_duplicate_rows"
+      "detail": "lost 2 row(s); 2 explained by merge_duplicate_rows"
     },
     {
       "name": "row_loss_bounded",
       "ok": true,
-      "detail": "lost 0.0% (limit 25%)"
+      "detail": "lost 16.7% (limit 25%)"
     },
     {
       "name": "no_column_emptied",
@@ -33,17 +29,17 @@
     {
       "name": "score_not_worse",
       "ok": true,
-      "detail": "before 91.8 -> after 92.9"
+      "detail": "before 91.8 -> after 99.4"
     },
     {
       "name": "audit_complete",
       "ok": true,
-      "detail": "5 audit record(s)"
+      "detail": "11 audit record(s)"
     }
   ],
-  "total_findings": 10,
-  "auto_fixed": 2,
-  "flagged": 8,
+  "total_findings": 9,
+  "auto_fixed": 9,
+  "flagged": 0,
   "ignored": 0,
   "findings": [
     {
@@ -56,10 +52,10 @@
       ],
       "affected_rows": [
         4,
-        9,
-        11
+        11,
+        9
       ],
-      "evidence": "Row 4 has empty email and age, and row 9 has 'NA' in amount, row 11 has empty age.",
+      "evidence": "Row 4 has empty email and age, and row 11 has empty age, while row 9 has 'NA' in amount.",
       "proposed_action": "fill_null_with",
       "agent": "SCHEMA_MD"
     },
@@ -74,21 +70,8 @@
         5,
         9
       ],
-      "evidence": "Row 2 uses '01/05/2024', row 5 uses 'Mar 3 2024', and row 9 uses '03/22/2024' — all different from the standard 'YYYY-MM-DD'.",
+      "evidence": "Row 2 uses '01/05/2024', row 5 uses 'Mar 3 2024', and row 9 uses '03/22/2024', all differing from the standard 'YYYY-MM-DD'.",
       "proposed_action": "standardize_date_format",
-      "agent": "SCHEMA_MD"
-    },
-    {
-      "finding_type": "type_mismatch",
-      "severity": "medium",
-      "affected_columns": [
-        "age"
-      ],
-      "affected_rows": [
-        8
-      ],
-      "evidence": "Row 8 has age='200', which is implausibly high for a human and likely a data entry error.",
-      "proposed_action": "none",
       "agent": "SCHEMA_MD"
     },
     {
@@ -96,13 +79,13 @@
       "severity": "low",
       "affected_columns": [
         "name",
-        "city"
+        "email"
       ],
       "affected_rows": [
         2,
-        7
+        8
       ],
-      "evidence": "Row 2 has 'jon  smith' with double space and 'san jose' in lowercase; row 7 has 'Maria  Garcia ' with trailing space.",
+      "evidence": "Row 2 has 'jon  smith' with double space and 'JON.SMITH@example.com' in uppercase, while row 8 has 'Maria  Garcia ' with trailing space.",
       "proposed_action": "trim_normalize_whitespace",
       "agent": "SCHEMA_MD"
     },
@@ -119,12 +102,12 @@
         0,
         2
       ],
-      "evidence": "Row 0 and row 2 both describe Jon Smith with the same email (case-insensitive), age, amount, and city, but name, email case, date format, and city casing differ.",
+      "evidence": "Row 0 'Jon Smith'/'jon.smith@example.com'/'2024-01-05'/'San Jose' and row 2 'jon  smith'/'JON.SMITH@example.com'/'01/05/2024'/'san jose' normalize to the same person with matching age and amount.",
       "proposed_action": "merge_duplicate_rows",
       "agent": "DUPLICATE_MD"
     },
     {
-      "finding_type": "fuzzy_duplicate",
+      "finding_type": "exact_duplicate",
       "severity": "high",
       "affected_columns": [
         "name"
@@ -133,7 +116,7 @@
         1,
         7
       ],
-      "evidence": "Row 1 and row 7 share the same email 'maria.garcia@example.com', signup_date, age, amount, and city, but the name in row 7 has extra spaces.",
+      "evidence": "Rows 1 and 7 both have email 'maria.garcia@example.com', signup_date '2024-01-06', age '29', amount '89.00', and city 'Oakland', with only the name differing as 'Maria Garcia' vs 'Maria  Garcia '.",
       "proposed_action": "merge_duplicate_rows",
       "agent": "DUPLICATE_MD"
     },
@@ -146,7 +129,7 @@
       "affected_rows": [
         8
       ],
-      "evidence": "Age value 200 at row 8 exceeds the IQR upper fence of 62.38.",
+      "evidence": "age=200 at row index 8 exceeds the IQR upper fence of 62.38.",
       "proposed_action": "flag_outlier",
       "agent": "ANOMALY_MD"
     },
@@ -159,7 +142,7 @@
       "affected_rows": [
         8
       ],
-      "evidence": "Age value 200 at row 8 is outside the business range [0,120].",
+      "evidence": "age=200 at row index 8 exceeds the business max of 120.",
       "proposed_action": "flag_outlier",
       "agent": "ANOMALY_MD"
     },
@@ -172,7 +155,7 @@
       "affected_rows": [
         5
       ],
-      "evidence": "Amount value 999999.00 at row 5 exceeds the IQR upper fence of 400.19.",
+      "evidence": "amount=999999 at row index 5 exceeds the IQR upper fence of 400.19.",
       "proposed_action": "flag_outlier",
       "agent": "ANOMALY_MD"
     },
@@ -185,7 +168,7 @@
       "affected_rows": [
         5
       ],
-      "evidence": "Amount value 999999.00 at row 5 is outside the business range [0,100000].",
+      "evidence": "amount=999999 at row index 5 exceeds the business max of 100000.",
       "proposed_action": "flag_outlier",
       "agent": "ANOMALY_MD"
     }
@@ -194,75 +177,95 @@
     {
       "finding_index": 0,
       "agent": "SCHEMA_MD",
-      "action": "flag_for_review",
+      "action": "auto_fix",
       "transform": "fill_null_with",
-      "reasoning": "Proposed action fill_null_with is in allow-list but uncertainty about fill values warrants review per rule 6."
+      "reasoning": "deterministic fallback: chief agent unavailable; allow-list + rule 3 applied"
     },
     {
       "finding_index": 1,
       "agent": "SCHEMA_MD",
       "action": "auto_fix",
       "transform": "standardize_date_format",
-      "reasoning": "Date format standardization is a clear formatting fix with high confidence, allowed by rule 5."
+      "reasoning": "deterministic fallback: chief agent unavailable; allow-list + rule 3 applied"
     },
     {
       "finding_index": 2,
       "agent": "SCHEMA_MD",
-      "action": "flag_for_review",
-      "transform": "none",
-      "reasoning": "Proposed action 'none' is not in allow-list, so rule 5 requires flag_for_review."
+      "action": "auto_fix",
+      "transform": "trim_normalize_whitespace",
+      "reasoning": "deterministic fallback: chief agent unavailable; allow-list + rule 3 applied"
     },
     {
       "finding_index": 3,
-      "agent": "SCHEMA_MD",
+      "agent": "DUPLICATE_MD",
       "action": "auto_fix",
-      "transform": "trim_normalize_whitespace",
-      "reasoning": "Whitespace normalization is a straightforward formatting fix allowed by rule 5."
+      "transform": "merge_duplicate_rows",
+      "reasoning": "deterministic fallback: chief agent unavailable; allow-list + rule 3 applied"
     },
     {
       "finding_index": 4,
       "agent": "DUPLICATE_MD",
-      "action": "flag_for_review",
+      "action": "auto_fix",
       "transform": "merge_duplicate_rows",
-      "reasoning": "Duplicate rows differ in formatting (name, email case, date format, city casing) so they do not agree on every non-empty field, requiring review per rule 4."
+      "reasoning": "deterministic fallback: chief agent unavailable; allow-list + rule 3 applied"
     },
     {
       "finding_index": 5,
-      "agent": "DUPLICATE_MD",
-      "action": "flag_for_review",
-      "transform": "merge_duplicate_rows",
-      "reasoning": "Duplicate rows differ in name formatting (extra spaces) so they do not agree on every non-empty field, requiring review per rule 4."
+      "agent": "ANOMALY_MD",
+      "action": "auto_fix",
+      "transform": "flag_outlier",
+      "reasoning": "deterministic fallback: chief agent unavailable; allow-list + rule 3 applied"
     },
     {
       "finding_index": 6,
       "agent": "ANOMALY_MD",
-      "action": "flag_for_review",
+      "action": "auto_fix",
       "transform": "flag_outlier",
-      "reasoning": "Anomaly findings are never auto_fix and at most flag_for_review per rule 3."
+      "reasoning": "deterministic fallback: chief agent unavailable; allow-list + rule 3 applied"
     },
     {
       "finding_index": 7,
       "agent": "ANOMALY_MD",
-      "action": "flag_for_review",
+      "action": "auto_fix",
       "transform": "flag_outlier",
-      "reasoning": "Anomaly findings are never auto_fix and at most flag_for_review per rule 3."
+      "reasoning": "deterministic fallback: chief agent unavailable; allow-list + rule 3 applied"
     },
     {
       "finding_index": 8,
       "agent": "ANOMALY_MD",
-      "action": "flag_for_review",
+      "action": "auto_fix",
       "transform": "flag_outlier",
-      "reasoning": "Anomaly findings are never auto_fix and at most flag_for_review per rule 3."
-    },
-    {
-      "finding_index": 9,
-      "agent": "ANOMALY_MD",
-      "action": "flag_for_review",
-      "transform": "flag_outlier",
-      "reasoning": "Anomaly findings are never auto_fix and at most flag_for_review per rule 3."
+      "reasoning": "deterministic fallback: chief agent unavailable; allow-list + rule 3 applied"
     }
   ],
   "audit_trail": [
+    {
+      "row": 4,
+      "column": "age",
+      "transform_name": "fill_null_with:median",
+      "before_value": "",
+      "after_value": "35.5",
+      "finding_id": 0,
+      "at": "2026-09-11T21:56:44.625Z"
+    },
+    {
+      "row": 11,
+      "column": "age",
+      "transform_name": "fill_null_with:median",
+      "before_value": "",
+      "after_value": "35.5",
+      "finding_id": 0,
+      "at": "2026-09-11T21:56:44.625Z"
+    },
+    {
+      "row": 9,
+      "column": "amount",
+      "transform_name": "fill_null_with:median",
+      "before_value": "NA",
+      "after_value": "155.25",
+      "finding_id": 0,
+      "at": "2026-09-11T21:56:44.625Z"
+    },
     {
       "row": 2,
       "column": "signup_date",
@@ -270,7 +273,7 @@
       "before_value": "01/05/2024",
       "after_value": "2024-01-05",
       "finding_id": 1,
-      "at": "2026-09-11T21:52:00.274Z"
+      "at": "2026-09-11T21:56:44.625Z"
     },
     {
       "row": 5,
@@ -279,7 +282,7 @@
       "before_value": "Mar 3 2024",
       "after_value": "2024-03-03",
       "finding_id": 1,
-      "at": "2026-09-11T21:52:00.274Z"
+      "at": "2026-09-11T21:56:44.625Z"
     },
     {
       "row": 9,
@@ -288,7 +291,7 @@
       "before_value": "03/22/2024",
       "after_value": "2024-03-22",
       "finding_id": 1,
-      "at": "2026-09-11T21:52:00.274Z"
+      "at": "2026-09-11T21:56:44.625Z"
     },
     {
       "row": 2,
@@ -296,189 +299,48 @@
       "transform_name": "trim_normalize_whitespace",
       "before_value": "jon  smith",
       "after_value": "jon smith",
+      "finding_id": 2,
+      "at": "2026-09-11T21:56:44.625Z"
+    },
+    {
+      "row": 2,
+      "column": "*",
+      "transform_name": "merge_duplicate_rows:drop",
+      "before_value": "{\"id\":\"3\",\"name\":\"jon smith\",\"email\":\"JON.SMITH@example.com\",\"signup_date\":\"2024-01-05\",\"age\":\"34\",\"amount\":\"120.50\",\"city\":\"san jose\"}",
+      "after_value": null,
       "finding_id": 3,
-      "at": "2026-09-11T21:52:00.274Z"
+      "at": "2026-09-11T21:56:44.626Z",
+      "dropped": true
     },
     {
       "row": 7,
-      "column": "name",
-      "transform_name": "trim_normalize_whitespace",
-      "before_value": "Maria  Garcia ",
-      "after_value": "Maria Garcia",
-      "finding_id": 3,
-      "at": "2026-09-11T21:52:00.274Z"
+      "column": "*",
+      "transform_name": "merge_duplicate_rows:drop",
+      "before_value": "{\"id\":\"8\",\"name\":\"Maria  Garcia \",\"email\":\"maria.garcia@example.com\",\"signup_date\":\"2024-01-06\",\"age\":\"29\",\"amount\":\"89.00\",\"city\":\"Oakland\"}",
+      "after_value": null,
+      "finding_id": 4,
+      "at": "2026-09-11T21:56:44.626Z",
+      "dropped": true
+    },
+    {
+      "row": 8,
+      "column": "__review_flags",
+      "transform_name": "flag_outlier",
+      "before_value": "",
+      "after_value": "outlier:age",
+      "finding_id": 5,
+      "at": "2026-09-11T21:56:44.626Z"
+    },
+    {
+      "row": 5,
+      "column": "__review_flags",
+      "transform_name": "flag_outlier",
+      "before_value": "",
+      "after_value": "outlier:amount",
+      "finding_id": 7,
+      "at": "2026-09-11T21:56:44.626Z"
     }
   ],
   "rejected_decisions": [],
-  "review_queue": [
-    {
-      "finding_index": 0,
-      "agent": "SCHEMA_MD",
-      "action": "flag_for_review",
-      "transform": "fill_null_with",
-      "reasoning": "Proposed action fill_null_with is in allow-list but uncertainty about fill values warrants review per rule 6.",
-      "finding": {
-        "finding_type": "null_values",
-        "severity": "high",
-        "affected_columns": [
-          "email",
-          "age",
-          "amount"
-        ],
-        "affected_rows": [
-          4,
-          9,
-          11
-        ],
-        "evidence": "Row 4 has empty email and age, and row 9 has 'NA' in amount, row 11 has empty age.",
-        "proposed_action": "fill_null_with",
-        "agent": "SCHEMA_MD"
-      }
-    },
-    {
-      "finding_index": 2,
-      "agent": "SCHEMA_MD",
-      "action": "flag_for_review",
-      "transform": "none",
-      "reasoning": "Proposed action 'none' is not in allow-list, so rule 5 requires flag_for_review.",
-      "finding": {
-        "finding_type": "type_mismatch",
-        "severity": "medium",
-        "affected_columns": [
-          "age"
-        ],
-        "affected_rows": [
-          8
-        ],
-        "evidence": "Row 8 has age='200', which is implausibly high for a human and likely a data entry error.",
-        "proposed_action": "none",
-        "agent": "SCHEMA_MD"
-      }
-    },
-    {
-      "finding_index": 4,
-      "agent": "DUPLICATE_MD",
-      "action": "flag_for_review",
-      "transform": "merge_duplicate_rows",
-      "reasoning": "Duplicate rows differ in formatting (name, email case, date format, city casing) so they do not agree on every non-empty field, requiring review per rule 4.",
-      "finding": {
-        "finding_type": "fuzzy_duplicate",
-        "severity": "high",
-        "affected_columns": [
-          "name",
-          "email",
-          "signup_date",
-          "city"
-        ],
-        "affected_rows": [
-          0,
-          2
-        ],
-        "evidence": "Row 0 and row 2 both describe Jon Smith with the same email (case-insensitive), age, amount, and city, but name, email case, date format, and city casing differ.",
-        "proposed_action": "merge_duplicate_rows",
-        "agent": "DUPLICATE_MD"
-      }
-    },
-    {
-      "finding_index": 5,
-      "agent": "DUPLICATE_MD",
-      "action": "flag_for_review",
-      "transform": "merge_duplicate_rows",
-      "reasoning": "Duplicate rows differ in name formatting (extra spaces) so they do not agree on every non-empty field, requiring review per rule 4.",
-      "finding": {
-        "finding_type": "fuzzy_duplicate",
-        "severity": "high",
-        "affected_columns": [
-          "name"
-        ],
-        "affected_rows": [
-          1,
-          7
-        ],
-        "evidence": "Row 1 and row 7 share the same email 'maria.garcia@example.com', signup_date, age, amount, and city, but the name in row 7 has extra spaces.",
-        "proposed_action": "merge_duplicate_rows",
-        "agent": "DUPLICATE_MD"
-      }
-    },
-    {
-      "finding_index": 6,
-      "agent": "ANOMALY_MD",
-      "action": "flag_for_review",
-      "transform": "flag_outlier",
-      "reasoning": "Anomaly findings are never auto_fix and at most flag_for_review per rule 3.",
-      "finding": {
-        "finding_type": "statistical_outlier",
-        "severity": "high",
-        "affected_columns": [
-          "age"
-        ],
-        "affected_rows": [
-          8
-        ],
-        "evidence": "Age value 200 at row 8 exceeds the IQR upper fence of 62.38.",
-        "proposed_action": "flag_outlier",
-        "agent": "ANOMALY_MD"
-      }
-    },
-    {
-      "finding_index": 7,
-      "agent": "ANOMALY_MD",
-      "action": "flag_for_review",
-      "transform": "flag_outlier",
-      "reasoning": "Anomaly findings are never auto_fix and at most flag_for_review per rule 3.",
-      "finding": {
-        "finding_type": "business_range_violation",
-        "severity": "high",
-        "affected_columns": [
-          "age"
-        ],
-        "affected_rows": [
-          8
-        ],
-        "evidence": "Age value 200 at row 8 is outside the business range [0,120].",
-        "proposed_action": "flag_outlier",
-        "agent": "ANOMALY_MD"
-      }
-    },
-    {
-      "finding_index": 8,
-      "agent": "ANOMALY_MD",
-      "action": "flag_for_review",
-      "transform": "flag_outlier",
-      "reasoning": "Anomaly findings are never auto_fix and at most flag_for_review per rule 3.",
-      "finding": {
-        "finding_type": "statistical_outlier",
-        "severity": "high",
-        "affected_columns": [
-          "amount"
-        ],
-        "affected_rows": [
-          5
-        ],
-        "evidence": "Amount value 999999.00 at row 5 exceeds the IQR upper fence of 400.19.",
-        "proposed_action": "flag_outlier",
-        "agent": "ANOMALY_MD"
-      }
-    },
-    {
-      "finding_index": 9,
-      "agent": "ANOMALY_MD",
-      "action": "flag_for_review",
-      "transform": "flag_outlier",
-      "reasoning": "Anomaly findings are never auto_fix and at most flag_for_review per rule 3.",
-      "finding": {
-        "finding_type": "business_range_violation",
-        "severity": "high",
-        "affected_columns": [
-          "amount"
-        ],
-        "affected_rows": [
-          5
-        ],
-        "evidence": "Amount value 999999.00 at row 5 is outside the business range [0,100000].",
-        "proposed_action": "flag_outlier",
-        "agent": "ANOMALY_MD"
-      }
-    }
-  ]
+  "review_queue": []
 }

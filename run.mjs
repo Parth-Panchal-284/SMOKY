@@ -379,6 +379,10 @@ async function main() {
 			rejected_decisions: repaired.rejected, review_queue: review,
 		};
 		writeFileSync('out/evidence_report.json', JSON.stringify(report, null, 2));
+		// Archive per run so the console can show PAST results, not just the last.
+		mkdirSync('out/runs', { recursive: true });
+		writeFileSync(`out/runs/${runId}.json`, JSON.stringify(report, null, 2));
+		writeFileSync(`out/runs/${runId}.csv`, toCSV(header, v.rows));
 
 		await hot.log_event('telemetry', telemetryEvent({
 			run_id: runId, agent: 'RUN', mode: chosen?.mode ?? modeArg, duration_ms: timings.reduce((a, t) => a + t.duration_ms, 0),
