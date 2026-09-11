@@ -96,3 +96,11 @@
 {"run_id":"run_hotdata_seq_145306","agent":"RUN","mode":"sequential","query_count":0,"duration_ms":155832,"outcome":"ok","cost":0,"note":"findings=9 fixed=9 flagged=0 ignored=0 91.8->99.4","ts":"2026-09-11T21:56:44.628Z"}
 {"run_id":"run_ui_150351","agent":"WAVE","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"failed","cost":0,"note":"parallel wave timed out after 420000ms","ts":"2026-09-11T22:11:38.476Z"}
 {"run_id":"run_ui_150351","agent":"SCHEMA_MD","mode":"sequential","query_count":1,"duration_ms":52817,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T22:12:31.294Z"}
+{"run_id":"run_hdpar_152843","agent":"SCHEMA_MD","mode":"parallel","query_count":1,"duration_ms":119832,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T22:30:49.978Z"}
+{"run_id":"run_hdpar_152843","agent":"DUPLICATE_MD","mode":"parallel","query_count":1,"duration_ms":119832,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T22:30:49.979Z"}
+{"run_id":"run_hdpar_152843","agent":"ANOMALY_MD","mode":"parallel","query_count":1,"duration_ms":119832,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T22:30:49.979Z"}
+{"run_id":"run_hdpar_152843","agent":"RUN","mode":"parallel","query_count":0,"duration_ms":119832,"outcome":"ok","cost":0,"note":"findings=8 fixed=3 flagged=5 ignored=0 91.8->94.5","ts":"2026-09-11T22:31:07.583Z"}
+{"run_id":"run_demo_final_153246","agent":"SCHEMA_MD","mode":"parallel","query_count":1,"duration_ms":49646,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T22:33:42.229Z"}
+{"run_id":"run_demo_final_153246","agent":"DUPLICATE_MD","mode":"parallel","query_count":1,"duration_ms":49646,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T22:33:42.230Z"}
+{"run_id":"run_demo_final_153246","agent":"ANOMALY_MD","mode":"parallel","query_count":1,"duration_ms":49646,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T22:33:42.230Z"}
+{"run_id":"run_demo_final_153246","agent":"RUN","mode":"parallel","query_count":0,"duration_ms":49646,"outcome":"ok","cost":0,"note":"findings=7 fixed=3 flagged=4 ignored=0 91.8->94.5","ts":"2026-09-11T22:33:59.688Z"}

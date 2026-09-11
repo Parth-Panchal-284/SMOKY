@@ -29,7 +29,7 @@
 		}
 	},
 	"hotdata": {
-		"enabled": true,
+		"enabled": false,
 		"_comment": "Flip to true once the Hotdata half is ready. When false the specialists analyse the data slice passed in the question context and the harness uses the mock telemetry sink. When true the generator wires one db_hotdata node per specialist (its own isolated ephemeral DB) and the pipeline performs create -> query -> destroy natively.",
 		"apikeyVar": "${ROCKETRIDE_HOTDATA_KEY}",
 		"workspaceVar": "${ROCKETRIDE_HOTDATA_WORKSPACE}",
@@ -42,7 +42,7 @@
 		"max_execute_rows": 25000,
 		"useRealTelemetrySink": false,
 		"_sink_comment": "Separate from `enabled`. `enabled` wires db_hotdata INTO the pipeline (ephemeral, per-run, engine-managed). This flag switches the HOST-SIDE persistent telemetry sink to RealHotdata, which is the teammate's unimplemented half. Leave false until RealHotdata.log_event exists.",
-		"_status": "WORKS in sequential mode: one specialist + its own ephemeral DB measured at 83s end to end. The 300s timeout was blown by three agents contending inside ONE parallel wave, not by Hotdata itself. Sequential gives each agent its own timeout."
+		"_status": "OFF for the demo, on evidence. Measured on the same dataset: without Hotdata the parallel wave runs 50-60s and returns 10-11 findings; with Hotdata it runs 120s and returns 8. The specialists receive the rows inlined in the prompt either way, so the tool adds LLM round trips (plan -> load_data -> generate SQL -> execute -> interpret) without adding information the agent did not already have. That is also the likeliest reason tool invocation could never be proven: an agent holding the answer has no reason to query for it. Hotdata earns its cost on data too large to inline -- 12 rows fit in a prompt, 500k do not. The wiring is validated and one flag away."
 	},
 	"anomaly": {
 		"iqrMultiplier": 1.5,
@@ -76,7 +76,9 @@
 	},
 	"run": {
 		"ttlSeconds": 600,
-		"maxWaves": 4,
-		"agentTimeoutMs": 420000
+		"maxWaves": 2,
+		"agentTimeoutMs": 300000,
+		"threadsParallel": 12,
+		"_threads_comment": "Engine execution threads for the parallel wave. With hotdata on there are 17 nodes and 6 LLM invokers (3 agents + 3 SQL generators), so 4 threads under-serves it. Sequential deliberately uses 1 -- that is what makes it a baseline."
 	}
 }

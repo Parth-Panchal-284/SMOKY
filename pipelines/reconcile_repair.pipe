@@ -50,7 +50,7 @@
 					"  \"reasoning\":\"<one sentence, cite the rule number you applied>\"}]}",
 					"Emit exactly one decision per finding, in the order you were given them."
 				],
-				"max_waves": 4,
+				"max_waves": 2,
 				"parameters": {}
 			},
 			"input": [
@@ -146,7 +146,7 @@
 		}
 	],
 	"source": "chat_1",
-	"project_id": "b356c5e5-9b17-4808-b746-80b3a2ab6ea6",
+	"project_id": "f7dfbabf-a87a-4e9d-9940-6286428b895c",
 	"viewport": {
 		"x": 0,
 		"y": 0,

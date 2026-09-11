@@ -104,10 +104,21 @@ function specialistNodes(spec, cfg, sourceId, row) {
 	const nodes = [agent];
 
 	if (cfg.hotdata.enabled) {
-		// db_hotdata itself requires an llm (min 1) to generate SQL — the same
-		// node serves both invokers, one control entry each.
-		llmControls.push({ classType: 'llm', from: h });
+		// db_hotdata needs its OWN llm to turn natural language into SQL.
+		//
+		// Sharing the agent's LLM node here was a mistake: the agent holds that
+		// node for its own turn, then calls the tool, which needs the same node
+		// to generate SQL. Six invokers (3 agents + 3 databases) contending for
+		// three LLM nodes serialises a wave that should run concurrently --
+		// measured 83s for one specialist alone but >300s for three together.
+		// A dedicated node per database costs three more nodes and removes the
+		// contention entirely.
 		nodes.push(hotdataNode(h, spec, cfg, a, { x: X_AGENT, y: y + 320 }));
+		nodes.push(
+			llmNode(`llm_sql_${spec.nodeKey}`, spec.id, cfg,
+				[{ classType: 'llm', from: h }],
+				{ x: X_AGENT + 170, y: y + 320 }),
+		);
 	}
 
 	nodes.push(llmNode(l, spec.id, cfg, llmControls, { x: X_AGENT, y: y + 160 }));

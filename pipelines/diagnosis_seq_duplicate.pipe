@@ -35,17 +35,6 @@
 					"- Propose merge_duplicate_rows for groups you are confident about; propose \"none\" when it may be a legitimate re-entry and let the chief agent decide.",
 					"- Do NOT report nulls, formats or numeric outliers — other specialists own those.",
 					"",
-					"You have a PRIVATE Hotdata database available as a tool. It is yours alone:",
-					"it is created when this task starts and destroyed when it ends, and no other",
-					"specialist can see it. Work through it rather than eyeballing the rows:",
-					"1. Load the rows you were given into the table \"slice_duplicate\" using the tool's load_data action.",
-					"2. Inspect the live schema the tool reports back, so you know the real column types.",
-					"3. Run read-only SQL against it to find your issues — aggregate, group, and count",
-					"   rather than scanning by eye. SQL is exact where reading a table by hand is not.",
-					"4. Base every finding on a query result, and quote the value you saw in evidence.",
-					"If a tool call fails, say so in evidence and fall back to reading the rows directly —",
-					"never invent a result you did not get back.",
-					"",
 					"Return ONLY a JSON object, no prose and no markdown fence:",
 					"{\"agent\": \"DUPLICATE_MD\", \"findings\": [ {",
 					"  \"finding_type\": \"<short_snake_case_kind>\",",
@@ -64,7 +53,7 @@
 					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
 					"- Do NOT wrap the JSON in markdown fences."
 				],
-				"max_waves": 4,
+				"max_waves": 2,
 				"parameters": {}
 			},
 			"input": [
@@ -85,41 +74,6 @@
 			}
 		},
 		{
-			"id": "hotdata_duplicate",
-			"provider": "db_hotdata",
-			"config": {
-				"type": "db_hotdata",
-				"apikey": "${ROCKETRIDE_HOTDATA_KEY}",
-				"workspace_id": "${ROCKETRIDE_HOTDATA_WORKSPACE}",
-				"api_url": "",
-				"table": "slice_duplicate",
-				"db_description": "Isolated text slice for DUPLICATE_MD. One ephemeral database per run: created when the task starts, queried read-only by the specialist, destroyed at teardown.",
-				"ttl": "1h",
-				"allow_execute": true,
-				"allow_destructive_load": false,
-				"job_timeout_secs": 300,
-				"async_after_ms": 5000,
-				"max_attempts": 3,
-				"max_execute_rows": 25000
-			},
-			"control": [
-				{
-					"classType": "tool",
-					"from": "agent_duplicate"
-				}
-			],
-			"ui": {
-				"position": {
-					"x": 260,
-					"y": 440
-				},
-				"measured": {
-					"width": 150,
-					"height": 135
-				}
-			}
-		},
-		{
 			"id": "llm_duplicate",
 			"provider": "llm_nebius",
 			"config": {
@@ -136,10 +90,6 @@
 				{
 					"classType": "llm",
 					"from": "agent_duplicate"
-				},
-				{
-					"classType": "llm",
-					"from": "hotdata_duplicate"
 				}
 			],
 			"ui": {
@@ -199,7 +149,7 @@
 		}
 	],
 	"source": "chat_1",
-	"project_id": "a450d493-a682-478a-a2ad-1ce7c32dd812",
+	"project_id": "e7840a80-9daa-43d5-9d6d-3fdebc397e61",
 	"viewport": {
 		"x": 0,
 		"y": 0,

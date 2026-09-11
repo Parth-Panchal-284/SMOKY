@@ -31,7 +31,7 @@ const flag = (k) => argv.includes(`--${k}`);
 
 const cfg = JSON.parse(readFileSync('config/dataer.config.json', 'utf8'));
 const csvPath = arg('csv', 'data/sample.csv');
-const modeArg = arg('mode', 'both');
+const modeArg = arg('mode', 'parallel');   // fastest path; --mode both for the speedup comparison
 const runId = arg('run-id', `run_${new Date().toISOString().slice(0, 19).replace(/[:T-]/g, '')}`);
 const dryRun = flag('dry-run');
 
@@ -133,7 +133,8 @@ async function runAgentsParallel(client, ds) {
 	// thread count and the three agents can end up serialised inside the wave,
 	// which would make the parallel-vs-sequential comparison meaningless.
 	const { token } = await client.use({
-		pipeline, ttl: cfg.run.ttlSeconds, threads: Math.max(4, SPECIALISTS.length),
+		pipeline, ttl: cfg.run.ttlSeconds,
+		threads: cfg.run.threadsParallel ?? Math.max(4, SPECIALISTS.length),
 		name: `dataer-diagnosis-parallel-${runId}`,
 	});
 	try {
