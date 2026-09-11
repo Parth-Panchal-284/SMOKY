@@ -1,0 +1,6 @@
+[
+  {"id":"Z1","name":"Downtown / SJSU","center_lat":37.3352,"center_lng":-121.8811,"risk_level":"HIGH"},
+  {"id":"Z2","name":"Willow Glen","center_lat":37.3080,"center_lng":-121.9007,"risk_level":"MEDIUM"},
+  {"id":"Z3","name":"North San Jose / Alviso","center_lat":37.4260,"center_lng":-121.9750,"risk_level":"CRITICAL"},
+  {"id":"Z4","name":"East San Jose","center_lat":37.3500,"center_lng":-121.8200,"risk_level":"LOW"}
+]

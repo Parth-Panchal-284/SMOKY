@@ -1,0 +1,6 @@
+[
+  {"id":"S1","name":"Downtown Community Shelter (Demo)","lat":37.3317,"lng":-121.8890,"capacity":200,"available_capacity":40,"status":"LIMITED_ACCESS","zone_id":"Z1"},
+  {"id":"S2","name":"Northside Emergency Center (Demo)","lat":37.3650,"lng":-121.9150,"capacity":300,"available_capacity":160,"status":"OPEN","zone_id":"Z3"},
+  {"id":"S3","name":"Willow Glen Relief Hub (Demo)","lat":37.3050,"lng":-121.8950,"capacity":180,"available_capacity":90,"status":"OPEN","zone_id":"Z2"},
+  {"id":"S4","name":"East Valley Emergency Shelter (Demo)","lat":37.3480,"lng":-121.8260,"capacity":250,"available_capacity":120,"status":"OPEN","zone_id":"Z4"}
+]
