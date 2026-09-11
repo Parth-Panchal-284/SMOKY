@@ -1,0 +1,14 @@
+id,product,description,tags,price,notes
+1,"Widget, Large","A ""premium"" widget, 10cm","a,b,c",19.99,Fine
+2,Gadget,"Multi-line
+description here",x;y,29.99,Has newline
+3,Doohickey 🔧,Emoji in name 🚀🚀,emoji,,Missing price
+4,مفتاح,RTL Arabic text,"rtl,intl",45.00,Right-to-left
+5,Thing,"He said """"it works""""",quoted,12.50,Escaped quotes
+6,Very Long Name xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,Truncation test,long,8.00,180-char name
+7,"Tab	Separated",Contains a tab char,tab,15.00,Tab inside field
+8,Null Byte Test,Backslash \ and pipe |,esc,22.00,Escapes
+9,,Empty product name,blank,33.00,Blank key field
+10,Ünïcödé Nämé,Accents everywhere,intl,41.00,Diacritics
+11,Semi;colon,Semicolons; inside; field,semi,17.75,Semicolons
+12,Zero Width​Space,Contains U+200B,hidden,9.99,Invisible char

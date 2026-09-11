@@ -1,0 +1,13 @@
+id,name,email,company,city,revenue
+1,José García,jose.garcia@acme.com,ACME Inc.,San José,50000
+2,Jose Garcia,JOSE.GARCIA@ACME.COM,Acme Incorporated,San Jose,50000
+3,J. García,jose.garcia+work@acme.com,ACME,san josé,50000
+4,Mr. Jose Garcia ,jose.garcia@acme.com ,acme inc,SAN JOSE,50000
+5,Ana Lúcia Silva,ana.silva@globex.br,Globex Corporation,São Paulo,72000
+6,Ana Lucia Silva,ana.silva@globex.br,Globex Corp.,Sao Paulo,72000
+7,Ana L. Silva,a.silva@globex.br,GLOBEX,sao paulo,72000
+8,Wei Zhang,wei.zhang@initech.cn,Initech,Shanghai,61000
+9,Zhang Wei,wei.zhang@initech.cn,Initech Ltd,shanghai,61000
+10,Deborah O'Brien,d.obrien@hooli.ie,Hooli,Dublin,44000
+11,Deborah OBrien,d.obrien@hooli.ie,Hooli plc,dublin,44000
+12,Kenji Watanabe,k.watanabe@umbrella.jp,Umbrella,Tokyo,88000

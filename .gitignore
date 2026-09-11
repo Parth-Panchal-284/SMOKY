@@ -10,5 +10,6 @@ out/raw_*.json
 .DS_Store
 frontend/**/__pycache__/
 data/uploads/
+!data/tests/
 out/runs/
 out/*.stdout

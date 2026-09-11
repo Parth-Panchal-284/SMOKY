@@ -1,0 +1,11 @@
+id,customer,joined,renewed,expires,age,balance
+1,Alice Nguyen,2024-01-05,01/05/2024,Jan 5 2024,34,1200.50
+2,Bob Carter,2024/02/11,11-02-2024,11 Feb 2024,,890.00
+3,Chen Wei,20240311,3/11/24,March 11 2024,41,NULL
+4,Dana Ross,2024-04-02T09:15:00Z,04.02.2024,2nd April 2024,N/A,450.25
+5,Eli Stone,,,,52,-
+6,Farah Aziz,2024-05-19,19/05/2024,May 19 2024,29,2310.75
+7,Greg Hall,05-20-2024,2024-05-20,20 May 2024,none,0
+8,Hana Sato,昨日,2024-06-01,Jun 1 2024,38,1100
+9,Ivan Petrov,2024-06-15,06/15/2024,,45,NaN
+10,Jo Kim,1717200000,2024-07-01,July 1 2024,-3,999.99
