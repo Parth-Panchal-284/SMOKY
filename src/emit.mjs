@@ -9,3 +9,6 @@ w('pipelines/diagnosis.pipe', buildParallel(cfg));
 for (const { spec, pipeline } of buildSequential(cfg))
 	w(`pipelines/diagnosis_seq_${spec.nodeKey}.pipe`, pipeline);
 w('pipelines/reconcile_repair.pipe', buildChief(cfg));
+
+// Webhook-fronted variant for an external frontend (see serve.mjs / RUNME).
+w('pipelines/diagnosis_webhook.pipe', buildParallel(cfg, 'webhook'));

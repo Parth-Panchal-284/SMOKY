@@ -1,17 +1,40 @@
 {
 	"components": [
 		{
-			"id": "chat_1",
-			"provider": "chat",
+			"id": "webhook_1",
+			"provider": "webhook",
 			"config": {
 				"hideForm": true,
 				"mode": "Source",
 				"parameters": {},
-				"type": "chat"
+				"type": "webhook"
 			},
 			"ui": {
 				"position": {
 					"x": 20,
+					"y": 200
+				},
+				"measured": {
+					"width": 150,
+					"height": 66
+				}
+			}
+		},
+		{
+			"id": "question_1",
+			"provider": "question",
+			"config": {
+				"parameters": {}
+			},
+			"input": [
+				{
+					"lane": "text",
+					"from": "webhook_1"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 130,
 					"y": 200
 				},
 				"measured": {
@@ -70,7 +93,7 @@
 			"input": [
 				{
 					"lane": "questions",
-					"from": "chat_1"
+					"from": "question_1"
 				}
 			],
 			"ui": {
@@ -226,7 +249,7 @@
 			"input": [
 				{
 					"lane": "questions",
-					"from": "chat_1"
+					"from": "question_1"
 				}
 			],
 			"ui": {
@@ -383,7 +406,7 @@
 			"input": [
 				{
 					"lane": "questions",
-					"from": "chat_1"
+					"from": "question_1"
 				}
 			],
 			"ui": {
@@ -519,8 +542,8 @@
 			}
 		}
 	],
-	"source": "chat_1",
-	"project_id": "a94cbfa1-fa5e-46d6-a48f-1521abdabca1",
+	"source": "webhook_1",
+	"project_id": "2a7d2963-743a-46bc-b940-03eb83065069",
 	"viewport": {
 		"x": 0,
 		"y": 0,

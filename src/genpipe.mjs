@@ -121,16 +121,36 @@ function specialistNodes(spec, cfg, sourceId, row) {
 	return { nodes, agentId: a };
 }
 
-function assemble(specs, cfg) {
-	const sourceId = 'chat_1';
+/**
+ * `chat` source  -> driven by client.chat() from the harness (the dev loop).
+ * `webhook` source -> HTTP-callable, for an external frontend. Both produce the
+ * `questions` lane, so the agent wiring is identical; only the front door moves.
+ */
+function assemble(specs, cfg, sourceKind = 'chat') {
+	const entryId = sourceKind === 'webhook' ? 'webhook_1' : 'chat_1';
 	const components = [
 		{
-			id: sourceId,
-			provider: 'chat',
-			config: { hideForm: true, mode: 'Source', parameters: {}, type: 'chat' },
+			id: entryId,
+			provider: sourceKind,
+			config: { hideForm: true, mode: 'Source', parameters: {}, type: sourceKind },
 			ui: { position: { x: X_SOURCE, y: Y_TOP + 80 }, measured: { width: 150, height: 66 } },
 		},
 	];
+	// `chat` emits `questions` directly. `webhook` emits text/json/tags, so a
+	// POSTed body needs the documented `question` converter (text -> questions)
+	// before it can reach an agent. Without it the POST is a 400: nothing in the
+	// pipeline consumes the lane the body landed on.
+	let sourceId = entryId;
+	if (sourceKind === 'webhook') {
+		sourceId = 'question_1';
+		components.push({
+			id: sourceId,
+			provider: 'question',
+			config: { parameters: {} },
+			input: [{ lane: 'text', from: entryId }],
+			ui: { position: { x: X_SOURCE + 110, y: Y_TOP + 80 }, measured: { width: 150, height: 66 } },
+		});
+	}
 	const agentIds = [];
 	specs.forEach((spec, i) => {
 		const { nodes, agentId } = specialistNodes(spec, cfg, sourceId, i);
@@ -149,7 +169,7 @@ function assemble(specs, cfg) {
 
 	return {
 		components,
-		source: sourceId,
+		source: entryId,
 		project_id: randomUUID(),
 		viewport: { x: 0, y: 0, zoom: 1 },
 		version: 1,
@@ -157,11 +177,11 @@ function assemble(specs, cfg) {
 }
 
 /** All three specialists in one wave. */
-export function buildParallel(cfg) {
-	return assemble(SPECIALISTS, cfg);
+export function buildParallel(cfg, sourceKind = 'chat') {
+	return assemble(SPECIALISTS, cfg, sourceKind);
 }
 
 /** One pipeline per specialist; the harness runs them back to back. */
-export function buildSequential(cfg) {
-	return SPECIALISTS.map((s) => ({ spec: s, pipeline: assemble([s], cfg) }));
+export function buildSequential(cfg, sourceKind = 'chat') {
+	return SPECIALISTS.map((s) => ({ spec: s, pipeline: assemble([s], cfg, sourceKind) }));
 }

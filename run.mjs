@@ -295,7 +295,15 @@ async function main() {
 
 	let client = null;
 	if (!dryRun) {
-		client = new RocketRideClient({ uri: process.env.ROCKETRIDE_URI, auth: process.env.ROCKETRIDE_APIKEY });
+		// persist: automatic reconnection. Long agent waves (especially with the
+		// Hotdata tool, which needs more turns) outlive a single websocket;
+		// without this a dropped socket kills the whole run mid-wave.
+		client = new RocketRideClient({
+			uri: process.env.ROCKETRIDE_URI,
+			auth: process.env.ROCKETRIDE_APIKEY,
+			persist: true,
+			onConnectError: (e) => log(`  ~ reconnecting: ${String(e?.message ?? e).slice(0, 80)}`),
+		});
 		await client.connect();
 	}
 

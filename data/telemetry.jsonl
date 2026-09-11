@@ -79,3 +79,5 @@
 {"run_id":"run_final_143053","agent":"DUPLICATE_MD","mode":"sequential","query_count":1,"duration_ms":33568,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:33:25.252Z"}
 {"run_id":"run_final_143053","agent":"ANOMALY_MD","mode":"sequential","query_count":1,"duration_ms":54401,"outcome":"ok","cost":0,"note":"","ts":"2026-09-11T21:34:19.654Z"}
 {"run_id":"run_final_143053","agent":"RUN","mode":"parallel","query_count":0,"duration_ms":197901,"outcome":"ok","cost":0,"note":"findings=11 fixed=7 flagged=4 ignored=0 91.8->94.5","ts":"2026-09-11T21:34:46.387Z"}
+{"run_id":"run_hd_143623","agent":"WAVE","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"failed","cost":0,"note":"Connection closed unexpectedly","ts":"2026-09-11T21:39:03.317Z"}
+{"run_id":"run_hd_143623","agent":"RUN","mode":"parallel","query_count":0,"duration_ms":0,"outcome":"ok","cost":0,"note":"findings=0 fixed=0 flagged=0 ignored=0 91.8->91.8","ts":"2026-09-11T21:39:03.319Z"}

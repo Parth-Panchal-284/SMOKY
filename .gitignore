@@ -8,3 +8,4 @@ out/*.log
 out/*.stdout
 out/raw_*.json
 .DS_Store
+frontend/**/__pycache__/
