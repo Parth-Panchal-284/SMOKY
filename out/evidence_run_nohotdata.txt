@@ -1,0 +1,65 @@
+run_id=run_final_143053  csv=data/sample.csv  rows=12  cols=7
+baseline health score: 91.8
+
+=== DIAGNOSIS (parallel) ===
+  fan-out returned 3 answer(s) (expected 3)
+  findings: 11
+    [SCHEMA_MD] null_values (high) -> fill_null_with
+    [SCHEMA_MD] inconsistent_date_format (high) -> standardize_date_format
+    [SCHEMA_MD] trim_normalize_whitespace (low) -> trim_normalize_whitespace
+    [SCHEMA_MD] null_values (medium) -> fill_null_with
+    [SCHEMA_MD] type_mismatch (medium) -> fill_null_with
+    [SCHEMA_MD] inconsistent_date_format (medium) -> standardize_date_format
+    [SCHEMA_MD] whitespace_issue (low) -> trim_normalize_whitespace
+    [ANOMALY_MD] statistical_outlier (high) -> flag_outlier
+    [ANOMALY_MD] statistical_outlier (high) -> flag_outlier
+    [ANOMALY_MD] business_range_violation (high) -> flag_outlier
+    [ANOMALY_MD] business_range_violation (high) -> flag_outlier
+
+=== DIAGNOSIS (sequential) ===
+  findings: 10
+    [SCHEMA_MD] null_values (high) -> fill_null_with
+    [SCHEMA_MD] inconsistent_date_format (high) -> standardize_date_format
+    [SCHEMA_MD] null_values (low) -> fill_null_with
+    [SCHEMA_MD] trim_normalize_whitespace (low) -> trim_normalize_whitespace
+    [DUPLICATE_MD] fuzzy_duplicate (high) -> merge_duplicate_rows
+    [DUPLICATE_MD] fuzzy_duplicate (high) -> merge_duplicate_rows
+    [ANOMALY_MD] statistical_outlier (high) -> flag_outlier
+    [ANOMALY_MD] business_range_violation (high) -> flag_outlier
+    [ANOMALY_MD] statistical_outlier (high) -> flag_outlier
+    [ANOMALY_MD] business_range_violation (high) -> flag_outlier
+
+=== TIMING (parallel vs sequential) ===
+  {"mode":"parallel","duration_ms":66970}
+  {"mode":"sequential","duration_ms":130931}
+  speedup: 1.96x  (saved 63961 ms)
+
+=== RECONCILE (chief) ===
+  chief returned 11 decision(s) in 19817ms
+    #0 auto_fix via fill_null_with — Proposed action fill_null_with is in allow-list and no conflicts; auto_fix per rule 5 and 
+    #1 auto_fix via standardize_date_format — Proposed action standardize_date_format is in allow-list and no conflicts; auto_fix per ru
+    #2 auto_fix via trim_normalize_whitespace — Proposed action trim_normalize_whitespace is in allow-list and no conflicts; auto_fix per 
+    #3 auto_fix via fill_null_with — Proposed action fill_null_with is in allow-list and no conflicts; auto_fix per rule 5 and 
+    #4 auto_fix via fill_null_with — Proposed action fill_null_with is in allow-list and no conflicts; auto_fix per rule 5 and 
+    #5 auto_fix via standardize_date_format — Proposed action standardize_date_format is in allow-list and no conflicts; auto_fix per ru
+    #6 auto_fix via trim_normalize_whitespace — Proposed action trim_normalize_whitespace is in allow-list and no conflicts; auto_fix per 
+    #7 flag_for_review via flag_outlier — ANOMALY_MD findings are at most flag_for_review per rule 3.
+    #8 flag_for_review via flag_outlier — ANOMALY_MD findings are at most flag_for_review per rule 3.
+    #9 flag_for_review via flag_outlier — ANOMALY_MD findings are at most flag_for_review per rule 3.
+    #10 flag_for_review via flag_outlier — ANOMALY_MD findings are at most flag_for_review per rule 3.
+
+=== REPAIR (allow-listed transforms only) ===
+  applied 7 decision(s), 8 change(s), 0 row(s) merged away
+
+=== VERIFY ===
+  PASS row_loss_explained — lost 0 row(s); 0 explained by merge_duplicate_rows
+  PASS row_loss_bounded — lost 0.0% (limit 25%)
+  PASS no_column_emptied — none emptied
+  PASS score_not_worse — before 91.8 -> after 94.5
+  PASS audit_complete — 8 audit record(s)
+  health score: 91.8 -> 94.5
+  telemetry published -> dataer/telemetry.json (39 events, 6 runs)
+
+  leaked Hotdata databases: 0 (none — create/destroy balanced)
+
+wrote out/cleaned.csv and out/evidence_report.json

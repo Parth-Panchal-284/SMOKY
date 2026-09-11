@@ -36,6 +36,17 @@
 					"- IQR multiplier k = 1.5.",
 					"- Business ranges (column -> allowed min/max): {\"age\":{\"min\":0,\"max\":120},\"amount\":{\"min\":0,\"max\":100000}}.",
 					"",
+					"You have a PRIVATE Hotdata database available as a tool. It is yours alone:",
+					"it is created when this task starts and destroyed when it ends, and no other",
+					"specialist can see it. Work through it rather than eyeballing the rows:",
+					"1. Load the rows you were given into the table \"slice_anomaly\" using the tool's load_data action.",
+					"2. Inspect the live schema the tool reports back, so you know the real column types.",
+					"3. Run read-only SQL against it to find your issues — aggregate, group, and count",
+					"   rather than scanning by eye. SQL is exact where reading a table by hand is not.",
+					"4. Base every finding on a query result, and quote the value you saw in evidence.",
+					"If a tool call fails, say so in evidence and fall back to reading the rows directly —",
+					"never invent a result you did not get back.",
+					"",
 					"Return ONLY a JSON object, no prose and no markdown fence:",
 					"{\"agent\": \"ANOMALY_MD\", \"findings\": [ {",
 					"  \"finding_type\": \"<short_snake_case_kind>\",",
@@ -54,7 +65,7 @@
 					"- Do NOT narrate, do NOT explain your reasoning, do NOT write \"Here's a thinking process\".",
 					"- Do NOT wrap the JSON in markdown fences."
 				],
-				"max_waves": 2,
+				"max_waves": 6,
 				"parameters": {}
 			},
 			"input": [
@@ -75,6 +86,41 @@
 			}
 		},
 		{
+			"id": "hotdata_anomaly",
+			"provider": "db_hotdata",
+			"config": {
+				"type": "db_hotdata",
+				"apikey": "${ROCKETRIDE_HOTDATA_KEY}",
+				"workspace_id": "${ROCKETRIDE_HOTDATA_WORKSPACE}",
+				"api_url": "",
+				"table": "slice_anomaly",
+				"db_description": "Isolated numeric slice for ANOMALY_MD. One ephemeral database per run: created when the task starts, queried read-only by the specialist, destroyed at teardown.",
+				"ttl": "1h",
+				"allow_execute": true,
+				"allow_destructive_load": false,
+				"job_timeout_secs": 300,
+				"async_after_ms": 5000,
+				"max_attempts": 3,
+				"max_execute_rows": 25000
+			},
+			"control": [
+				{
+					"classType": "tool",
+					"from": "agent_anomaly"
+				}
+			],
+			"ui": {
+				"position": {
+					"x": 260,
+					"y": 440
+				},
+				"measured": {
+					"width": 150,
+					"height": 135
+				}
+			}
+		},
+		{
 			"id": "llm_anomaly",
 			"provider": "llm_nebius",
 			"config": {
@@ -91,6 +137,10 @@
 				{
 					"classType": "llm",
 					"from": "agent_anomaly"
+				},
+				{
+					"classType": "llm",
+					"from": "hotdata_anomaly"
 				}
 			],
 			"ui": {
@@ -150,7 +200,7 @@
 		}
 	],
 	"source": "chat_1",
-	"project_id": "34e45042-0134-4b8d-ab9a-de444117f21c",
+	"project_id": "e2ed29c8-dbe3-49ba-8f38-6aac7305eca3",
 	"viewport": {
 		"x": 0,
 		"y": 0,

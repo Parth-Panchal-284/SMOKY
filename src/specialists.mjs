@@ -80,6 +80,28 @@ export const SPECIALISTS = [
 	},
 ];
 
+/**
+ * Extra instructions when hotdata.enabled — the specialist gets its own
+ * ephemeral Hotdata database as a tool. The component creates the database at
+ * task start and destroys it at teardown; the agent's job is to load its slice,
+ * query it, and report. That create -> query -> destroy lifecycle is the point.
+ */
+function hotdataInstructions(spec) {
+	return [
+		'',
+		'You have a PRIVATE Hotdata database available as a tool. It is yours alone:',
+		'it is created when this task starts and destroyed when it ends, and no other',
+		'specialist can see it. Work through it rather than eyeballing the rows:',
+		`1. Load the rows you were given into the table "slice_${spec.nodeKey}" using the tool's load_data action.`,
+		'2. Inspect the live schema the tool reports back, so you know the real column types.',
+		'3. Run read-only SQL against it to find your issues — aggregate, group, and count',
+		'   rather than scanning by eye. SQL is exact where reading a table by hand is not.',
+		'4. Base every finding on a query result, and quote the value you saw in evidence.',
+		'If a tool call fails, say so in evidence and fall back to reading the rows directly —',
+		'never invent a result you did not get back.',
+	];
+}
+
 /** Build the full instruction block for one specialist (shared by both modes). */
 export function specialistPrompt(spec, cfg) {
 	const extra =
@@ -94,6 +116,7 @@ export function specialistPrompt(spec, cfg) {
 		'',
 		...spec.instructions.map((l) => `- ${l}`),
 		...extra.map((l) => `- ${l}`),
+		...(cfg.hotdata?.enabled ? hotdataInstructions(spec) : []),
 		'',
 		OUTPUT_CONTRACT.replace(/<YOUR_AGENT_ID>/g, spec.id),
 	].join('\n');

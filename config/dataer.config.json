@@ -29,7 +29,7 @@
 		}
 	},
 	"hotdata": {
-		"enabled": false,
+		"enabled": true,
 		"_comment": "Flip to true once the Hotdata half is ready. When false the specialists analyse the data slice passed in the question context and the harness uses the mock telemetry sink. When true the generator wires one db_hotdata node per specialist (its own isolated ephemeral DB) and the pipeline performs create -> query -> destroy natively.",
 		"apikeyVar": "${ROCKETRIDE_HOTDATA_KEY}",
 		"workspaceVar": "${ROCKETRIDE_HOTDATA_WORKSPACE}",
@@ -39,7 +39,9 @@
 		"job_timeout_secs": 300,
 		"async_after_ms": 5000,
 		"max_attempts": 3,
-		"max_execute_rows": 25000
+		"max_execute_rows": 25000,
+		"useRealTelemetrySink": false,
+		"_sink_comment": "Separate from `enabled`. `enabled` wires db_hotdata INTO the pipeline (ephemeral, per-run, engine-managed). This flag switches the HOST-SIDE persistent telemetry sink to RealHotdata, which is the teammate's unimplemented half. Leave false until RealHotdata.log_event exists."
 	},
 	"anomaly": {
 		"iqrMultiplier": 1.5,
@@ -73,7 +75,7 @@
 	},
 	"run": {
 		"ttlSeconds": 600,
-		"maxWaves": 2,
+		"maxWaves": 6,
 		"agentTimeoutMs": 300000
 	}
 }

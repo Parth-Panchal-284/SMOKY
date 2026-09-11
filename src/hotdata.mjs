@@ -93,9 +93,25 @@ export class RealHotdata {
 	openDatabases() { return []; }
 }
 
-/** Single swap point — the spec's "single flag or import swap". */
+/**
+ * Single swap point.
+ *
+ * IMPORTANT: `hotdata.enabled` controls the IN-PIPELINE integration only — it
+ * makes the generator wire one db_hotdata node per specialist, and the engine
+ * handles create/query/destroy server-side. It says nothing about this
+ * host-side telemetry sink, which is a separate concern (a persistent
+ * cross-session database, not a per-run ephemeral one).
+ *
+ * Conflating the two meant turning on the pipeline integration also swapped
+ * telemetry to the unimplemented RealHotdata stub, which killed the run before
+ * a single pipeline started. Gate the sink on its own flag.
+ */
 export function makeHotdata(cfg, env = process.env) {
-	if (cfg.hotdata.enabled && env.ROCKETRIDE_HOTDATA_KEY)
-		return new RealHotdata({ apiKey: env.ROCKETRIDE_HOTDATA_KEY, workspaceId: env.ROCKETRIDE_HOTDATA_WORKSPACE });
+	const useReal = cfg.hotdata.useRealTelemetrySink === true && env.ROCKETRIDE_HOTDATA_KEY;
+	if (useReal)
+		return new RealHotdata({
+			apiKey: env.ROCKETRIDE_HOTDATA_KEY,
+			workspaceId: env.ROCKETRIDE_HOTDATA_WORKSPACE,
+		});
 	return new MockHotdata();
 }
